@@ -38,12 +38,19 @@
   }
 
   function checar() {
-    var comApi = !!window.RESPIRAR_API;   // GitHub Pages: o "build" da página é o do próprio site (versao.json)
+    var comApi = window.RESPIRAR_MODO !== 'servidor';   // GitHub Pages: o "build" da página é o do próprio site (versao.json)
     var url = comApi ? 'versao.json' : '/publico/versao';
     lerJson(url)
-      .then(function (j) { conferirBuild(j); if (!comApi) rotuloServidor(j); })
+      .then(function (j) {
+        conferirBuild(j);
+        if (!comApi) rotuloServidor(j);
+        else if (window.RESPIRAR_MODO === 'estatico' && j && j.versao) {
+          var v = document.getElementById('versao-servidor');
+          if (v) { v.textContent = 'site v' + j.versao; v.title = 'Versão do site publicado (sem servidor)'; }
+        }
+      })
       .catch(function () { /* sem rede: tenta de novo no próximo ciclo */ });
-    if (comApi) {
+    if (window.RESPIRAR_MODO === 'conectado') {
       lerJson(respirarUrl('/publico/versao')).then(rotuloServidor).catch(function () {});
     }
   }

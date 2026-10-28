@@ -65,17 +65,33 @@
   function periodoTxt() { return dias === 1 ? 'nas últimas 24 horas' : 'nos últimos ' + dias + ' dias'; }
 
   /* ------------------------------------------------------------------ dados */
+  var ESTATICO = window.RESPIRAR_MODO === 'estatico';
+  // No modo estático os relatos são um retrato publicado em dados/painel-N.json (não há servidor).
+  function urlPainel() { return ESTATICO ? 'dados/painel-' + dias + '.json' : respirarUrl('/publico/painel?dias=' + dias); }
+  function dataManaus(iso) {
+    var t = Date.parse(iso); if (!isFinite(t)) return null;
+    var d = new Date(t - 4 * 3600 * 1000), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return p(d.getUTCDate()) + '/' + p(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear() + ' ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes());
+  }
   function carregar() {
-    fetch(respirarUrl('/publico/painel?dias=' + dias), { headers: { Accept: 'application/json' } })
+    fetch(urlPainel(), { headers: { Accept: 'application/json' }, cache: ESTATICO ? 'no-cache' : 'default' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (d) { dados = d; ultimoOk = Date.now(); desenhar(); })
-      .catch(function () { estado('erro', 'Sem conexão com o servidor. Tentando de novo…'); });
+      .catch(function () {
+        estado('erro', ESTATICO
+          ? 'Os relatos dos usuários ainda não foram publicados neste site (retrato de ' + dias + ' dia(s) indisponível).'
+          : 'Sem conexão com o servidor. Tentando de novo…');
+      });
   }
   function estado(tipo, txt) {
     var el = $('live'); el.className = 'live ' + tipo; $('live-txt').textContent = txt;
   }
   function atualizarRelogio() {
     if (!ultimoOk) return;
+    if (ESTATICO) {
+      estado('ok', 'Retrato publicado em ' + (dataManaus(dados && dados.gerado_em) || 'data não informada') + ' (horário de Manaus). Não é ao vivo.');
+      return;
+    }
     var s = Math.round((Date.now() - ultimoOk) / 1000);
     estado('ok', 'Ao vivo · atualizado há ' + (s < 60 ? s + ' s' : Math.floor(s / 60) + ' min'));
   }
@@ -86,7 +102,7 @@
     $('priv-min').textContent = (dados.minimo_para_divulgar > 0 || dados.minimo_por_area > 1)
       ? 'Há mínimos de divulgação: gráficos com ' + dados.minimo_para_divulgar + '+ respostas e áreas do mapa com ' + dados.minimo_por_area + '+.'
       : 'Os gráficos e o mapa aparecem mesmo com poucas respostas; como não há identificação pessoal, nenhum mínimo é exigido.';
-    $('baixar').setAttribute('href', respirarUrl('/publico/painel?dias=' + dias));
+    $('baixar').setAttribute('href', ESTATICO ? urlPainel() : respirarUrl('/publico/painel?dias=' + dias));
     atualizarRelogio();
     avisoSeInsuficiente();
     kpis();
@@ -353,7 +369,7 @@
   });
 
   carregar();
-  timer = setInterval(function () { if (!document.hidden) carregar(); }, 15000);
+  timer = setInterval(function () { if (!document.hidden) carregar(); }, ESTATICO ? 300000 : 15000);
   setInterval(atualizarRelogio, 1000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) carregar(); });
 })();

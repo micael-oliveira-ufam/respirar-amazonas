@@ -42,8 +42,11 @@
   }
 
   function carregar() {
-    fetch(respirarUrl('/publico/qualidade-ar'), { headers: { Accept: 'application/json' } })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    var origem = window.RESPIRAR_MODO === 'estatico'
+      ? window.RespirarArModelo.consultar()   // sem servidor: Open-Meteo direto do navegador
+      : fetch(respirarUrl('/publico/qualidade-ar'), { headers: { Accept: 'application/json' } })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    origem
       .then(function (d) { dados = d; $('ar-erro').hidden = true; desenhar(); })
       .catch(function () {
         $('ar-erro').hidden = false;
@@ -70,7 +73,7 @@
     var ref = dados.referencia_modelo ? manausCompleta(dados.referencia_modelo) : null;
     var refTxt = ref ? 'Última atualização dos dados do modelo: ' + ref + ' (horário de Manaus).' : 'A data de atualização do modelo não foi informada pelo serviço.';
     var cons = manausCompleta(dados.consultado_em);
-    $('ar-atualizacao').textContent = refTxt + (cons ? ' Consultados pelo servidor em ' + cons + '.' : '');
+    $('ar-atualizacao').textContent = refTxt + (cons ? (window.RESPIRAR_MODO === 'estatico' ? ' Consultados pelo seu navegador em ' : ' Consultados pelo servidor em ') + cons + '.' : '');
     el.appendChild(kpi('Referência do modelo', ref ? ref + ' (Manaus)' : 'não informada',
       'consultado em ' + (manausCompleta(dados.consultado_em) || '—') + ' · ' + r.com_dado + ' de ' + r.total + ' municípios com dado', '#1565C0'));
 

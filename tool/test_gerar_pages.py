@@ -17,13 +17,13 @@ spec.loader.exec_module(gp)
 API = "https://respirar-amazonas.cloud"
 
 
-def _gerar(tmp_path, api=API):
+def _gerar(tmp_path, api=API):  # api=None: modo estático
     saida = tmp_path / "site"
     build = gp.gerar(saida, api, "https://usuario.github.io/repo")
     return saida, build
 
 
-def test_caminhos_relativos_e_sem_dependencia_do_servidor(tmp_path):
+def test_caminhos_relativos_no_modo_conectado(tmp_path):
     saida, _ = _gerar(tmp_path)
     html = (saida / "index.html").read_text(encoding="utf-8")
     assert not re.findall(r'(?:src|href)="/[^"/]', html)          # nada absoluto: o Pages usa /repo/ como base
@@ -40,6 +40,8 @@ def test_caminhos_relativos_e_sem_dependencia_do_servidor(tmp_path):
 
 def test_config_aponta_para_a_api_e_csp_libera_so_ela(tmp_path):
     saida, _ = _gerar(tmp_path)
+    assert "window.RESPIRAR_MODO = 'conectado';" in (saida / "assets" / "config.js").read_text(encoding="utf-8")
+    assert not (saida / "assets" / "municipios_am.json").exists()
     assert f"window.RESPIRAR_API = '{API}';" in (saida / "assets" / "config.js").read_text(encoding="utf-8")
     html = (saida / "index.html").read_text(encoding="utf-8")
     meta = re.search(r'http-equiv="Content-Security-Policy" content="([^"]+)"', html).group(1)
@@ -47,9 +49,38 @@ def test_config_aponta_para_a_api_e_csp_libera_so_ela(tmp_path):
     assert "unsafe-eval" not in meta and "script-src 'self' 'unsafe" not in meta
 
 
+def test_modo_estatico_nao_depende_do_servidor(tmp_path):
+    saida, _ = _gerar(tmp_path, api=None)
+    html = (saida / "index.html").read_text(encoding="utf-8")
+    cfg = (saida / "assets" / "config.js").read_text(encoding="utf-8")
+    assert "window.RESPIRAR_MODO = 'estatico';" in cfg and "window.RESPIRAR_API = '';" in cfg
+    assert "releases/latest" in cfg
+    assert "respirar-amazonas.cloud" not in html + cfg                 # nenhum endereço do servidor
+    assert 'href="dados/painel-30.json"' in html and 'src="assets/ar_modelo.js' in html
+    meta = re.search(r'http-equiv="Content-Security-Policy" content="([^"]+)"', html).group(1)
+    assert "connect-src 'self' https://air-quality-api.open-meteo.com;" in meta
+    assert "respirar-amazonas.cloud" not in meta
+    for p in ("assets/municipios_am.json", "assets/qr-app.svg", "assets/Manual-Instalacao-RespirAR-Amazonas.pdf", "assets/ar_modelo.js"):
+        assert (saida / p).is_file(), p
+    import json
+    munis = json.loads((saida / "assets" / "municipios_am.json").read_text(encoding="utf-8"))
+    assert len(munis) == 62 and {"codigo", "nome", "lat", "lon"} == set(munis[0])
+    assert (saida / "assets" / "qr-app.svg").read_text(encoding="utf-8").lstrip().startswith(("<?xml", "<svg"))
+    assert json.loads((saida / "versao.json").read_text())["versao"] == (RAIZ / "VERSION").read_text().strip()
+
+
+def test_regerar_preserva_os_dados_publicados(tmp_path):
+    saida, _ = _gerar(tmp_path, api=None)
+    (saida / "dados").mkdir()
+    (saida / "dados" / "manifest.json").write_text("{}")
+    gp.gerar(saida, None, "https://usuario.github.io/repo")
+    assert (saida / "dados" / "manifest.json").read_text() == "{}"
+    assert not list(tmp_path.glob("*.tmp"))
+
+
 def test_saida_deterministica(tmp_path):
-    a, ba = _gerar(tmp_path / "a")
-    b, bb = _gerar(tmp_path / "b")
+    a, ba = _gerar(tmp_path / "a", api=None)
+    b, bb = _gerar(tmp_path / "b", api=None)
     assert ba == bb
     cmp = filecmp.dircmp(a, b)
     assert not cmp.diff_files and not cmp.left_only and not cmp.right_only
@@ -67,9 +98,10 @@ def test_docs_publicado_esta_atualizado():
     assert docs.is_dir(), "docs/ não existe: rode python3 tool/gerar_pages.py"
     import tempfile
     with tempfile.TemporaryDirectory() as t:
-        gp.gerar(Path(t) / "x", API, gp.URL_PADRAO)
+        gp.gerar(Path(t) / "x", None, gp.URL_PADRAO)
         novo = Path(t) / "x"
         arquivos = sorted(p.relative_to(novo) for p in novo.rglob("*") if p.is_file())
-        assert arquivos == sorted(p.relative_to(docs) for p in docs.rglob("*") if p.is_file())
+        publicados = sorted(p.relative_to(docs) for p in docs.rglob("*") if p.is_file() and p.relative_to(docs).parts[0] != "dados")
+        assert arquivos == publicados
         defasados = [str(a) for a in arquivos if (novo / a).read_bytes() != (docs / a).read_bytes()]
         assert not defasados, f"docs/ desatualizado ({defasados[:3]}...): rode python3 tool/gerar_pages.py"

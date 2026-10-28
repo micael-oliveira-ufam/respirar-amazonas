@@ -12,6 +12,19 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.20.0.
+
+## [1.20.0] - 2026-10-27
+
+### Alterado
+- **O site do GitHub Pages agora é independente do servidor (modo estático, padrão de `tool/gerar_pages.py`).** Pedido do usuário (27/10/2026). O modo que lê a API continua disponível com `--api`.
+  - **Qualidade do ar:** o navegador consulta o Open-Meteo direto (`ar_modelo.js`), com a mesma lógica de `qualidade_ar.py`. A paridade é testada no Node com a mesma resposta do Open-Meteo (casos de empate no arredondamento, valores ausentes, negativos, `time` em vários formatos).
+  - **Relatos e CSV:** arquivos em `docs/dados/` (retrato publicado por `tool/publicar_dados_pages.py`, tudo-ou-nada); a página diz "Retrato publicado em … Não é ao vivo". Sem retrato, mostra que os relatos ainda não foram publicados.
+  - **Download do app:** botão para a página de versões do GitHub (`releases/latest`), QR code estático e manual em PDF dentro do site.
+  - CSP do Pages: só o Open-Meteo além da própria origem; nenhum endereço do servidor.
+  - `docs/dados/` é preservada ao regenerar o site. O aviso "nova versão" e o rodapé usam o `versao.json` do próprio site.
+  - Testes: paridade JS/Python (7), `tool/test_publicar_dados_pages.py` (3), modo estático e preservação de `docs/dados` em `tool/test_gerar_pages.py`.
+
 Nenhuma mudança desde a 1.19.0.
 
 ## [1.19.0] - 2026-10-27

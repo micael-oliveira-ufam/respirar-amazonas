@@ -204,15 +204,24 @@ Limites que valem saber:
 | "Permissão bloqueada" | Negada em definitivo | Liberar nas configurações do Android |
 | `flutter analyze` falha com "Unexpected end of input" (`LspByteStreamServerChannel`) | Caminho do projeto com acentos ou espaços (ex.: `Projeto Alerta Fumaça AM`). O analisador conta bytes e caracteres de forma diferente, e a mensagem chega cortada. `flutter test` pode funcionar, porque não usa o analisador | Mover a pasta para um caminho só com letras, números e hífens, e rodar `flutter clean && flutter analyze` de novo |
 
-## Site no GitHub Pages
+## Site no GitHub Pages (sem servidor)
 
-O site público (`/`) também existe como site estático na pasta `docs/`, para abrir sem servidor local. Ele lê os dados da API (`https://respirar-amazonas.cloud`).
+O site público também existe como site estático na pasta `docs/`, que abre **sem servidor**:
 
-1. Gerar: `python3 tool/gerar_pages.py` (outra API: `--api https://outro.exemplo`). Rode de novo e commite `docs/` sempre que mudar a página (`server/app/static_publico/`) ou a versão.
-2. Publicar (uma vez): no GitHub, Settings > Pages > Source: *Deploy from a branch* > `main` > `/docs`.
-3. Endereço esperado: `https://micael-oliveira-ufam.github.io/respirar-amazonas/`.
+- **Qualidade do ar:** o navegador consulta o Open-Meteo direto.
+- **Relatos dos usuários e CSV:** um *retrato* publicado em `docs/dados/` (não é ao vivo; a página mostra a data).
+- **Download do app:** botão para a página de *Releases* do GitHub, QR code e manual em PDF.
 
-O servidor continua necessário para receber as respostas do app e servir os dados agregados.
+```bash
+python3 tool/gerar_pages.py                         # gera docs/ (casca do site)
+python3 tool/publicar_dados_pages.py                # (opcional) baixa o retrato dos dados do servidor para docs/dados/
+git add docs && git commit -m "Atualiza o site" && git push origin main
+```
+
+1. Publicar (uma vez): Settings > Pages > Source: *Deploy from a branch* > `main` > `/docs`. Endereço esperado: `https://micael-oliveira-ufam.github.io/respirar-amazonas/`.
+2. APK: envie o arquivo gerado por `tool/gerar_apk.sh` como *Release* em Releases > Draft a new release (o Git não guarda o APK).
+3. Rode `gerar_pages.py` de novo e faça commit de `docs/` sempre que mudar `server/app/static_publico/` ou a versão. O servidor só é necessário no passo opcional do retrato.
+4. Para o site ler os dados ao vivo do servidor: `python3 tool/gerar_pages.py --api https://respirar-amazonas.cloud`.
 
 ## Versionamento
 

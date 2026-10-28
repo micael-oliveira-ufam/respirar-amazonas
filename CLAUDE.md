@@ -515,6 +515,14 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - Verificado: Chromium com o site numa porta e a API (dados fictícios) em outra (origens diferentes): 4 chamadas à API com 200, 5 marcadores no mapa de relatos, data de atualização do ar, bloco de download com links absolutos para a API, sem erro de JS e sem violação de CSP. NÃO verificado: o site publicado de verdade no github.io, Cloudflare/HTTPS reais com CORS, o que o GitHub Pages faz com cache, mapas com tiles/camadas reais (bloqueados no sandbox).
 - Limites: o QR code e o link do APK continuam apontando para a API (o APK não vai ao Git); se o servidor estiver desligado, o Pages abre mas mostra "Sem conexão com o servidor".
 
+### 4.46 Pages independente do servidor — versão 1.20.0
+- Pedido do usuário (27/10/2026): "O GitHub Pages deve ser independente do servidor por enquanto." Passou a ser o modo padrão de `tool/gerar_pages.py` (modo estático); `--api URL` mantém o modo conectado da 1.19.0.
+- Como cada parte funciona sem servidor: ar = Open-Meteo direto do navegador (`ar_modelo.js`, paridade com `qualidade_ar.py` testada no Node); relatos e CSV = retrato em `docs/dados/` criado por `python3 tool/publicar_dados_pages.py --api <servidor>` (precisa do servidor UMA vez, na hora de publicar; **não é ao vivo**); app = GitHub Releases (`releases/latest`), QR estático e manual em PDF no site.
+- Fluxo: `python3 tool/gerar_pages.py` (casca) → `python3 tool/publicar_dados_pages.py` (retrato) → `git add docs && git commit && git push`. O APK precisa ser enviado por você como *Release* no GitHub (arquivos grandes não vão ao Git; o sandbox não cria releases).
+- Verificado: Chromium com a API DESLIGADA: zero chamadas ao servidor, Open-Meteo simulado por interceptação (o sandbox não alcança o Open-Meteo), retrato com 5 respostas fictícias, 7 CSV, troca de período, QR e manual; sem retrato a página mostra a mensagem correta; sem erro de JS nem violação de CSP. **NÃO verificado:** se o Open-Meteo permite CORS a partir do github.io (não consegui confirmar da documentação nem por rede; o Flutter já o consulta, mas isso não prova CORS no navegador), a página publicada de verdade, existência de uma Release no GitHub.
+- Privacidade: `docs/dados/` publica no Git (com histórico permanente) os mesmos agregados da página pública, com mínimos hoje em 0/1 (ver 4.37/4.38). Conferir antes de publicar, sobretudo se o repositório for público.
+- Armadilha de processo: NÃO matar processos de teste com laço sobre `/proc` casando `cmdline`; o comando casa a si mesmo e derruba o shell (mesmo problema do `pkill -f`). Guardar o PID ao iniciar e matar por ele.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

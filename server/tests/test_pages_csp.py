@@ -33,3 +33,15 @@ def test_csp_do_pages_so_acrescenta_a_api():
         assert valores <= pg[nome], (nome, valores - pg[nome])
     assert set(pg) - set(srv) == set()
     assert api in pg["connect-src"] and api in pg["img-src"]
+
+
+def test_csp_do_modo_estatico_so_acrescenta_o_open_meteo():
+    srv = _diretivas(_CSP_PUBLICO)
+    pg = _diretivas(_gp().csp(None))
+    om = "https://air-quality-api.open-meteo.com"
+    for nome, valores in srv.items():
+        if nome == "frame-ancestors":
+            continue
+        assert valores <= pg[nome], nome
+        assert pg[nome] - valores <= ({om} if nome == "connect-src" else set()), nome
+    assert om in pg["connect-src"]

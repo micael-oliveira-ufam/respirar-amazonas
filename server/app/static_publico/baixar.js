@@ -18,7 +18,21 @@
   function mb(b) { return (b / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' MB'; }
 
   // ------------------------------------------------------------- download do app
+  // Sem servidor (GitHub Pages independente): o APK fica nas "versões" do GitHub e o QR code é um arquivo do site.
+  function appEstatico() {
+    var box = limpar($('app-conteudo'));
+    var url = window.RESPIRAR_RELEASES;
+    var qr = h('img', { src: 'assets/qr-app.svg', alt: 'QR code para a página de download do aplicativo', width: '132', height: '132' });
+    var texto = h('div', { class: 'app-txt' },
+      h('a', { class: 'btn', href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Baixar para Android'),
+      h('p', { class: 'app-meta', text: 'O arquivo (APK) fica na página de versões do projeto no GitHub; baixe o mais recente.' }),
+      h('p', { class: 'app-nota', text: 'Aponte a câmera do celular para o QR code. Ao abrir o arquivo, o Android pode pedir permissão para instalar apps desta origem. Versão para iPhone: ainda não disponível.' }),
+      h('p', { class: 'app-nota' }, h('a', { href: 'assets/Manual-Instalacao-RespirAR-Amazonas.pdf', download: 'Manual-Instalacao-RespirAR-Amazonas.pdf' }, 'Baixar o manual de instalação (PDF, com imagens)')));
+    box.appendChild(h('div', { class: 'app-linha' }, h('div', { class: 'qr' }, qr), texto));
+  }
+
   function app() {
+    if (window.RESPIRAR_MODO === 'estatico') { appEstatico(); return; }
     fetch(respirarUrl('/publico/app'), { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (i) {
@@ -62,7 +76,29 @@
     var on = document.querySelector('#periodo button.on');
     return on ? on.getAttribute('data-dias') : '30';
   }
+  var manifesto = null;   // modo estático: dados/manifest.json lista os CSV publicados
+  function dataRetrato() {   // dd/mm/aaaa no horário de Manaus (UTC-4)
+    var t = manifesto && Date.parse(manifesto.gerado_em); if (!isFinite(t)) return null;
+    var d = new Date(t - 4 * 3600 * 1000), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return p(d.getUTCDate()) + '/' + p(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear();
+  }
+  function linksEstaticos() {
+    var d = periodo(), rot = d === '1' ? 'últimas 24 h' : 'últimos ' + d + ' dias';
+    $('csv-periodo').textContent = rot;
+    var el = limpar($('csv-lista'));
+    var itens = manifesto ? manifesto.csv.filter(function (x) { return !x.dias || String(x.dias) === d; }) : [];
+    if (!itens.length) {
+      el.appendChild(h('p', { class: 'sub', text: 'Os arquivos CSV ainda não foram publicados neste site para este período.' }));
+      return;
+    }
+    itens.forEach(function (x) {
+      var c = CONJUNTOS.filter(function (k) { return k[0] === x.conjunto; })[0];
+      el.appendChild(h('a', { class: 'csv-item', href: 'dados/' + x.arquivo, download: '' },
+        h('b', { text: c ? c[1] : x.conjunto }), h('span', { text: (c ? c[2] : '') + (x.dias ? ' · ' + rot : '') + (dataRetrato() ? ' · retrato de ' + dataRetrato() : '') }), h('em', { text: 'Baixar CSV' })));
+    });
+  }
   function links() {
+    if (window.RESPIRAR_MODO === 'estatico') { linksEstaticos(); return; }
     var d = periodo(), rot = d === '1' ? 'últimas 24 h' : 'últimos ' + d + ' dias';
     $('csv-periodo').textContent = rot;
     var el = limpar($('csv-lista'));
@@ -73,6 +109,9 @@
     });
   }
   $('periodo').addEventListener('click', function () { setTimeout(links, 0); }); // depois de publico.js marcar o botão
-  links();
+  if (window.RESPIRAR_MODO === 'estatico') {
+    fetch('dados/manifest.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (m) { manifesto = m; links(); }).catch(function () { links(); });
+  } else links();
   app();
 })();
