@@ -9,7 +9,8 @@ Modo estático (sem servidor):
   - qualidade do ar: o navegador consulta o Open-Meteo direto (assets/ar_modelo.js);
   - relatos dos usuários e CSV: arquivos publicados em docs/dados/ por tool/publicar_dados_pages.py
     (um RETRATO, não ao vivo; sem eles a página diz que ainda não foram publicados);
-  - download do app: página de versões do GitHub (--releases) + QR code estático + manual em PDF.
+  - download do app: link DIRETO para o APK numa Release do GitHub (--apk-url) + QR code estático + manual em PDF.
+    O endereço do APK tem a versão no nome: a cada APK novo, rode de novo com o novo --apk-url (ou edite APK_URL_PADRAO).
 Modo conectado: igual à 1.19.0 (a API fornece relatos, ar, download e CSV).
 A saída é determinística (sem data/hora): a mesma entrada gera exatamente os mesmos bytes. A pasta
 docs/dados/ é preservada ao regenerar. Publicação: Settings > Pages > Deploy from a branch > main > /docs
@@ -30,7 +31,7 @@ from urllib.parse import urlparse
 RAIZ = Path(__file__).resolve().parent.parent
 FONTE = RAIZ / "server" / "app" / "static_publico"
 VENDOR = RAIZ / "server" / "app" / "static" / "vendor"
-RELEASES_PADRAO = "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/latest"
+APK_URL_PADRAO = "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk"
 MUNICIPIOS_CSV = RAIZ / "server" / "app" / "dados" / "municipios_am.csv"
 MANUAL_PDF = RAIZ / "server" / "app" / "manual" / "Manual_Instalacao_RespirAR_Amazonas.pdf"
 OPEN_METEO = "https://air-quality-api.open-meteo.com"
@@ -79,6 +80,14 @@ def transformar_html(html: str, api: str | None, url_site: str, versao: str) -> 
     return html
 
 
+def validar_apk_url(url: str) -> str:
+    """O endereço vai para o config.js (entre aspas) e para o QR code: só https e sem caracteres que quebrem o JS."""
+    u = urlparse(url.strip())
+    if u.scheme != "https" or not u.netloc or not re.fullmatch(r"[A-Za-z0-9._~:/%+@\-]+", url.strip()):
+        raise SystemExit(f"URL do APK inválida: {url!r} (use https://, sem espaços nem aspas)")
+    return url.strip()
+
+
 def qr_svg(destino: str) -> bytes:
     """QR code (SVG) do endereço de download, com o mesmo estilo do servidor (/publico/qr.svg)."""
     try:
@@ -98,7 +107,7 @@ def municipios_json() -> str:
     return json.dumps(lista, ensure_ascii=False, separators=(",", ":")) + "\n"
 
 
-def gerar(saida: Path, api: str | None, url_site: str, releases: str = RELEASES_PADRAO) -> str:
+def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PADRAO) -> str:
     versao = (RAIZ / "VERSION").read_text(encoding="utf-8").strip()
     guardado = None
     if saida.exists():
@@ -120,9 +129,9 @@ def gerar(saida: Path, api: str | None, url_site: str, releases: str = RELEASES_
            f"window.RESPIRAR_MODO = '{modo}';\n"
            f"window.RESPIRAR_API = '{api or ''}';\n")
     if api is None:
-        cfg += f"window.RESPIRAR_RELEASES = '{releases}';\n"
+        cfg += f"window.RESPIRAR_APK_URL = '{apk_url}';\n"
         (saida / "assets" / "municipios_am.json").write_text(municipios_json(), encoding="utf-8")
-        (saida / "assets" / "qr-app.svg").write_bytes(qr_svg(releases))
+        (saida / "assets" / "qr-app.svg").write_bytes(qr_svg(apk_url))
         shutil.copy2(MANUAL_PDF, saida / "assets" / "Manual-Instalacao-RespirAR-Amazonas.pdf")
     cfg += "window.respirarUrl = function (caminho) { return (window.RESPIRAR_API || '') + caminho; };\n"
     (saida / "assets" / "config.js").write_text(cfg, encoding="utf-8")
@@ -148,12 +157,12 @@ def gerar(saida: Path, api: str | None, url_site: str, releases: str = RELEASES_
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--api", default=None, help="modo conectado: endereço do servidor de dados (omitido = modo estático)")
-    ap.add_argument("--releases", default=RELEASES_PADRAO, help="modo estático: página de download do APK")
+    ap.add_argument("--apk-url", default=APK_URL_PADRAO, help="modo estático: endereço direto do APK (Release do GitHub)")
     ap.add_argument("--url", default=URL_PADRAO, help="endereço público do site no Pages (para canonical e prévias)")
     ap.add_argument("--saida", default=str(RAIZ / "docs"))
     a = ap.parse_args(argv)
     api = origem(a.api) if a.api else None
-    build = gerar(Path(a.saida), api, a.url, a.releases)
+    build = gerar(Path(a.saida), api, a.url, validar_apk_url(a.apk_url))
     print(f"Site gerado em {a.saida} (build {build}); " + (f"dados vindos de {api}." if api else "modo estático, sem servidor."))
     return 0
 

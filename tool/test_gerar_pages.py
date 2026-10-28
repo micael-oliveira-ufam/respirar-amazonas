@@ -54,7 +54,8 @@ def test_modo_estatico_nao_depende_do_servidor(tmp_path):
     html = (saida / "index.html").read_text(encoding="utf-8")
     cfg = (saida / "assets" / "config.js").read_text(encoding="utf-8")
     assert "window.RESPIRAR_MODO = 'estatico';" in cfg and "window.RESPIRAR_API = '';" in cfg
-    assert "releases/latest" in cfg
+    assert f"window.RESPIRAR_APK_URL = '{gp.APK_URL_PADRAO}';" in cfg
+    assert gp.APK_URL_PADRAO == "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk"
     assert "respirar-amazonas.cloud" not in html + cfg                 # nenhum endereço do servidor
     assert 'href="dados/painel-30.json"' in html and 'src="assets/ar_modelo.js' in html
     meta = re.search(r'http-equiv="Content-Security-Policy" content="([^"]+)"', html).group(1)
@@ -105,3 +106,19 @@ def test_docs_publicado_esta_atualizado():
         assert arquivos == publicados
         defasados = [str(a) for a in arquivos if (novo / a).read_bytes() != (docs / a).read_bytes()]
         assert not defasados, f"docs/ desatualizado ({defasados[:3]}...): rode python3 tool/gerar_pages.py"
+
+
+@pytest.mark.parametrize("ruim", ["http://x.org/a.apk", "https://x.org/a'b.apk", "https://x.org/a b.apk", "ftp://x.org/a", "https://", "x"])
+def test_apk_url_invalida_e_recusada(ruim):
+    with pytest.raises(SystemExit):
+        gp.validar_apk_url(ruim)
+
+
+def test_apk_url_personalizada_vai_para_o_config_e_o_qr(tmp_path):
+    saida = tmp_path / "s"
+    nova = "https://github.com/u/r/releases/download/v1.21.0/RespirAR-Amazonas-v1.21.0.apk"
+    gp.gerar(saida, None, "https://u.github.io/r", gp.validar_apk_url(nova))
+    assert nova in (saida / "assets" / "config.js").read_text(encoding="utf-8")
+    outro = tmp_path / "o"
+    gp.gerar(outro, None, "https://u.github.io/r")
+    assert (saida / "assets" / "qr-app.svg").read_bytes() != (outro / "assets" / "qr-app.svg").read_bytes()  # QR muda com o endereço

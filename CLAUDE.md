@@ -526,6 +526,9 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 ### 4.47 Java no macOS — versão 1.20.1
 - Saída real do usuário (27/10/2026): `Unable to locate a Java Runtime ... Gradle task assembleRelease failed` ao rodar `gerar_apk.sh`. A mensagem é do atalho `/usr/bin/java` do macOS, então a máquina do usuário agora é **macOS** (o 4.22/4.25 tratava de Linux). Causa e correção: ver CHANGELOG 1.20.1. **Não verificado:** em Mac real (testei só com pastas simuladas e um `java` falso no PATH), se o JDK do Android Studio serve ao Gradle desta versão do Flutter, e `brew install openjdk@17`. Se o usuário não tiver Homebrew, o caminho é o Android Studio ou um instalador Temurin.
 
+### 4.48 Download direto do APK no Pages — versão 1.20.2
+- Pedido do usuário (27/10/2026): o botão de download aponta direto para `https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk`. Verificado pela API do GitHub (`gh api .../releases`): existe a Release com a tag **`v.1.20.0`** (com ponto depois do v, grafia do usuário, diferente da tag `v1.20.0` do Git local) e o asset `RespirAR-Amazonas-v1.20.0.apk` (54 541 255 bytes). NÃO verificado: o download em si (o ambiente não acessa github.com/releases por navegador) e a instalação do APK. Efeito: o site passa a oferecer SEMPRE esse arquivo até regenerar com `--apk-url`.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

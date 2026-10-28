@@ -21,11 +21,12 @@
   // Sem servidor (GitHub Pages independente): o APK fica nas "versões" do GitHub e o QR code é um arquivo do site.
   function appEstatico() {
     var box = limpar($('app-conteudo'));
-    var url = window.RESPIRAR_RELEASES;
-    var qr = h('img', { src: 'assets/qr-app.svg', alt: 'QR code para a página de download do aplicativo', width: '132', height: '132' });
+    var url = window.RESPIRAR_APK_URL;
+    var arquivo = decodeURIComponent(url.split('/').pop());
+    var qr = h('img', { src: 'assets/qr-app.svg', alt: 'QR code para baixar o aplicativo no celular', width: '132', height: '132' });
     var texto = h('div', { class: 'app-txt' },
-      h('a', { class: 'btn', href: url, target: '_blank', rel: 'noopener noreferrer' }, 'Baixar para Android'),
-      h('p', { class: 'app-meta', text: 'O arquivo (APK) fica na página de versões do projeto no GitHub; baixe o mais recente.' }),
+      h('a', { class: 'btn', href: url, download: arquivo }, 'Baixar para Android'),
+      h('p', { class: 'app-meta' }, h('code', { text: arquivo })),
       h('p', { class: 'app-nota', text: 'Aponte a câmera do celular para o QR code. Ao abrir o arquivo, o Android pode pedir permissão para instalar apps desta origem. Versão para iPhone: ainda não disponível.' }),
       h('p', { class: 'app-nota' }, h('a', { href: 'assets/Manual-Instalacao-RespirAR-Amazonas.pdf', download: 'Manual-Instalacao-RespirAR-Amazonas.pdf' }, 'Baixar o manual de instalação (PDF, com imagens)')));
     box.appendChild(h('div', { class: 'app-linha' }, h('div', { class: 'qr' }, qr), texto));

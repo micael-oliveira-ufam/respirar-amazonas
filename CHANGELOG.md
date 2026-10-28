@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.20.2.
+
+## [1.20.2] - 2026-10-27
+
+### Alterado
+- **Site do Pages: "Baixar para Android" e o QR code vão direto para o APK da Release** (`.../releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk`, endereço informado pelo usuário), e não mais para a página de versões. O endereço fica em `APK_URL_PADRAO` (`tool/gerar_pages.py`) e pode ser trocado com `--apk-url`; só aceita `https` e sem caracteres que quebrem o JavaScript. Como o nome do arquivo leva a versão, **a cada APK novo é preciso regenerar o site com o novo endereço**.
+
 Nenhuma mudança desde a 1.20.1.
 
 ## [1.20.1] - 2026-10-27
