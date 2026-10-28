@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.20.1.
+
+## [1.20.1] - 2026-10-27
+
+### Corrigido
+- **`tool/gerar_apk.sh` no macOS parava no Gradle com "Unable to locate a Java Runtime".** Causa: no macOS o `/usr/bin/java` é só um atalho que imprime essa mensagem enquanto não há JDK, e `tool/_ambiente.sh` só procurava JDK em `/usr/lib/jvm` (Linux). Agora procura também `java_home`, Homebrew (`openjdk@17/21`, Apple Silicon e Intel), `~/Library/Java/JavaVirtualMachines`, `/Library/Java/JavaVirtualMachines` e o JDK do Android Studio, e só aceita um JDK que execute de verdade. O `gerar_apk.sh` confere o Java antes de começar e, se faltar, diz como instalar (`brew install openjdk@17`). `tool/instalar_requisitos_macos.sh` ganhou o passo do JDK 17. Testes: `tool/test_ambiente_java.py` (7, com pastas simuladas).
+
 Nenhuma mudança desde a 1.20.0.
 
 ## [1.20.0] - 2026-10-27

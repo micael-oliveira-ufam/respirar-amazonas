@@ -8,6 +8,7 @@
 #
 # Requisitos: Flutter 3.27+ (flutter doctor), Java 17 e Android SDK.
 # No Linux, instale tudo com:  bash tool/instalar_requisitos_linux.sh
+# No macOS, o Java (JDK 17) vem de:  brew install openjdk@17   (ou bash tool/instalar_requisitos_macos.sh)
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -33,6 +34,7 @@ fi
 python3 tool/versao.py verificar || { echo 'Corrija a versão antes de gerar o APK (tool/versao.py).'; exit 1; }
 
 command -v flutter >/dev/null || { mensagem_instalar_flutter; exit 1; }
+exigir_java || exit 1
 
 # Gera android/ e ios/ se ainda não existem (não são versionadas).
 if [[ ! -d android ]]; then

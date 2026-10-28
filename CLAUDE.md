@@ -523,6 +523,9 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - Privacidade: `docs/dados/` publica no Git (com histórico permanente) os mesmos agregados da página pública, com mínimos hoje em 0/1 (ver 4.37/4.38). Conferir antes de publicar, sobretudo se o repositório for público.
 - Armadilha de processo: NÃO matar processos de teste com laço sobre `/proc` casando `cmdline`; o comando casa a si mesmo e derruba o shell (mesmo problema do `pkill -f`). Guardar o PID ao iniciar e matar por ele.
 
+### 4.47 Java no macOS — versão 1.20.1
+- Saída real do usuário (27/10/2026): `Unable to locate a Java Runtime ... Gradle task assembleRelease failed` ao rodar `gerar_apk.sh`. A mensagem é do atalho `/usr/bin/java` do macOS, então a máquina do usuário agora é **macOS** (o 4.22/4.25 tratava de Linux). Causa e correção: ver CHANGELOG 1.20.1. **Não verificado:** em Mac real (testei só com pastas simuladas e um `java` falso no PATH), se o JDK do Android Studio serve ao Gradle desta versão do Flutter, e `brew install openjdk@17`. Se o usuário não tiver Homebrew, o caminho é o Android Studio ou um instalador Temurin.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).
