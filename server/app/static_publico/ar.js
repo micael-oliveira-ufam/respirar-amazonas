@@ -42,7 +42,7 @@
   }
 
   function carregar() {
-    fetch('/publico/qualidade-ar', { headers: { Accept: 'application/json' } })
+    fetch(respirarUrl('/publico/qualidade-ar'), { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (d) { dados = d; $('ar-erro').hidden = true; desenhar(); })
       .catch(function () {

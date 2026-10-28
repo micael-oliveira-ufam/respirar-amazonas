@@ -1,5 +1,5 @@
 /* Aviso de nova versão da página: quem deixa a aba aberta não fica com código antigo.
-   Consulta /publico/versao; se o "build" mudar em relação ao da carga, mostra um aviso para recarregar.
+   Consulta /publico/versao (ou, no GitHub Pages, versao.json do próprio site); se o "build" mudar em relação ao da carga, mostra um aviso para recarregar.
    Nunca recarrega sozinho (não perde o que a pessoa está lendo). */
 (function () {
   'use strict';
@@ -24,17 +24,28 @@
     document.body.appendChild(d);
   }
 
+  function rotuloServidor(j) {
+    var v = document.getElementById('versao-servidor');
+    if (v && j && j.servidor) v.textContent = 'servidor v' + j.servidor;
+  }
+  function conferirBuild(j) {
+    if (!j || !j.build) return;
+    if (inicial === null) inicial = j.build;
+    else if (j.build !== inicial) aviso();
+  }
+  function lerJson(url) {
+    return fetch(url, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; });
+  }
+
   function checar() {
-    fetch('/publico/versao', { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) {
-        if (!j || !j.build) return;
-        var v = document.getElementById('versao-servidor');
-        if (v && j.servidor) v.textContent = 'servidor v' + j.servidor;
-        if (inicial === null) inicial = j.build;
-        else if (j.build !== inicial) aviso();
-      })
+    var comApi = !!window.RESPIRAR_API;   // GitHub Pages: o "build" da página é o do próprio site (versao.json)
+    var url = comApi ? 'versao.json' : '/publico/versao';
+    lerJson(url)
+      .then(function (j) { conferirBuild(j); if (!comApi) rotuloServidor(j); })
       .catch(function () { /* sem rede: tenta de novo no próximo ciclo */ });
+    if (comApi) {
+      lerJson(respirarUrl('/publico/versao')).then(rotuloServidor).catch(function () {});
+    }
   }
 
   checar();

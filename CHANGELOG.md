@@ -12,7 +12,18 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
-Nenhuma mudança desde a 1.18.0.
+Nenhuma mudança desde a 1.19.0.
+
+## [1.19.0] - 2026-10-27
+
+### Adicionado
+- **Site no GitHub Pages (pasta `docs/`).** A página pública passou a poder ser servida como site estático, então abrir o site não depende mais de um servidor ligado no seu computador. Os DADOS (respostas agregadas, qualidade do ar, download do app, CSV) continuam vindo da API em `https://respirar-amazonas.cloud`; o servidor segue necessário só para receber as respostas do app e servir esses dados.
+  - `tool/gerar_pages.py`: gera `docs/` a partir da página do servidor (caminhos relativos, `config.js` com o endereço da API, CSP em `<meta>`, `versao.json`, `.nojekyll`, `404.html`). Saída determinística.
+  - `config.js` (`RESPIRAR_API`, `respirarUrl`): vazio no servidor (tudo igual a antes); com a API no Pages.
+  - CORS de leitura (GET/HEAD/OPTIONS) em `/publico/*` no servidor; fora de `/publico/` nada muda (`/respostas` continua sem CORS).
+  - Aviso "nova versão" no Pages compara o `versao.json` do próprio site.
+  - Sem GitHub Actions (regra do repositório): publicar em Settings > Pages > Deploy from a branch > `main` > `/docs`.
+  - Testes: `tool/test_gerar_pages.py` (inclui conferir que `docs/` não está desatualizado) e `server/tests/test_pages_csp.py`, `test_cors_publico.py`.
 
 ## [1.18.0] - 2026-10-21
 

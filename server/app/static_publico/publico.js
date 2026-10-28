@@ -66,7 +66,7 @@
 
   /* ------------------------------------------------------------------ dados */
   function carregar() {
-    fetch('/publico/painel?dias=' + dias, { headers: { Accept: 'application/json' } })
+    fetch(respirarUrl('/publico/painel?dias=' + dias), { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (d) { dados = d; ultimoOk = Date.now(); desenhar(); })
       .catch(function () { estado('erro', 'Sem conexão com o servidor. Tentando de novo…'); });
@@ -86,7 +86,7 @@
     $('priv-min').textContent = (dados.minimo_para_divulgar > 0 || dados.minimo_por_area > 1)
       ? 'Há mínimos de divulgação: gráficos com ' + dados.minimo_para_divulgar + '+ respostas e áreas do mapa com ' + dados.minimo_por_area + '+.'
       : 'Os gráficos e o mapa aparecem mesmo com poucas respostas; como não há identificação pessoal, nenhum mínimo é exigido.';
-    $('baixar').setAttribute('href', '/publico/painel?dias=' + dias);
+    $('baixar').setAttribute('href', respirarUrl('/publico/painel?dias=' + dias));
     atualizarRelogio();
     avisoSeInsuficiente();
     kpis();

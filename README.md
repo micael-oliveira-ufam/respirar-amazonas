@@ -204,6 +204,16 @@ Limites que valem saber:
 | "Permissão bloqueada" | Negada em definitivo | Liberar nas configurações do Android |
 | `flutter analyze` falha com "Unexpected end of input" (`LspByteStreamServerChannel`) | Caminho do projeto com acentos ou espaços (ex.: `Projeto Alerta Fumaça AM`). O analisador conta bytes e caracteres de forma diferente, e a mensagem chega cortada. `flutter test` pode funcionar, porque não usa o analisador | Mover a pasta para um caminho só com letras, números e hífens, e rodar `flutter clean && flutter analyze` de novo |
 
+## Site no GitHub Pages
+
+O site público (`/`) também existe como site estático na pasta `docs/`, para abrir sem servidor local. Ele lê os dados da API (`https://respirar-amazonas.cloud`).
+
+1. Gerar: `python3 tool/gerar_pages.py` (outra API: `--api https://outro.exemplo`). Rode de novo e commite `docs/` sempre que mudar a página (`server/app/static_publico/`) ou a versão.
+2. Publicar (uma vez): no GitHub, Settings > Pages > Source: *Deploy from a branch* > `main` > `/docs`.
+3. Endereço esperado: `https://micael-oliveira-ufam.github.io/respirar-amazonas/`.
+
+O servidor continua necessário para receber as respostas do app e servir os dados agregados.
+
 ## Versionamento
 
 Uma versão só para o projeto (app e servidor), no padrão [SemVer](https://semver.org/lang/pt-BR/). A fonte é o arquivo `VERSION`; o `tool/versao.py` mantém as cópias sincronizadas (`pubspec.yaml`, `lib/data/app_info.dart`, `server/app/main.py`) e confere o `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)).

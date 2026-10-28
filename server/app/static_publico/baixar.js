@@ -19,7 +19,7 @@
 
   // ------------------------------------------------------------- download do app
   function app() {
-    fetch('/publico/app', { headers: { Accept: 'application/json' } })
+    fetch(respirarUrl('/publico/app'), { headers: { Accept: 'application/json' } })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (i) {
         var box = limpar($('app-conteudo'));
@@ -31,13 +31,13 @@
         var data = new Date(i.atualizado_em);
         var meta = [i.plataforma + ' (APK)', i.versao ? 'versão ' + i.versao : null, mb(i.tamanho_bytes),
           isFinite(data) ? 'atualizado em ' + data.toLocaleDateString('pt-BR') : null].filter(Boolean).join(' · ');
-        var qr = h('img', { src: '/publico/qr.svg?alvo=app', alt: 'QR code para baixar o aplicativo no celular', width: '132', height: '132' });
+        var qr = h('img', { src: respirarUrl('/publico/qr.svg?alvo=app'), alt: 'QR code para baixar o aplicativo no celular', width: '132', height: '132' });
         var texto = h('div', { class: 'app-txt' },
-          h('a', { class: 'btn', href: i.url, download: i.arquivo }, 'Baixar para Android'),
+          h('a', { class: 'btn', href: respirarUrl(i.url), download: i.arquivo }, 'Baixar para Android'),
           h('p', { class: 'app-meta' }, h('code', { text: i.arquivo })),
           h('p', { class: 'app-meta', text: meta }),
           h('p', { class: 'app-nota', text: 'Aponte a câmera do celular para o QR code. Ao abrir o arquivo, o Android pode pedir permissão para instalar apps desta origem. Versão para iPhone: ainda não disponível.' }),
-          (i.manual_url ? h('p', { class: 'app-nota' }, h('a', { href: i.manual_url, download: 'Manual-Instalacao-RespirAR-Amazonas.pdf' }, 'Baixar o manual de instalação (PDF, com imagens)')) : null),
+          (i.manual_url ? h('p', { class: 'app-nota' }, h('a', { href: respirarUrl(i.manual_url), download: 'Manual-Instalacao-RespirAR-Amazonas.pdf' }, 'Baixar o manual de instalação (PDF, com imagens)')) : null),
           h('details', {}, h('summary', { text: 'Conferir a integridade (SHA-256)' }), h('code', { class: 'hash', text: i.sha256 })));
         var linha = h('div', { class: 'app-linha' }, h('div', { class: 'qr' }, qr), texto);
         limpar($('app-conteudo')).appendChild(linha);
@@ -67,7 +67,7 @@
     $('csv-periodo').textContent = rot;
     var el = limpar($('csv-lista'));
     CONJUNTOS.forEach(function (c) {
-      var href = '/publico/export.csv?conjunto=' + c[0] + (c[3] ? '&dias=' + d : '');
+      var href = respirarUrl('/publico/export.csv?conjunto=' + c[0] + (c[3] ? '&dias=' + d : ''));
       el.appendChild(h('a', { class: 'csv-item', href: href, download: '' },
         h('b', { text: c[1] }), h('span', { text: c[2] + (c[3] ? ' · ' + rot : '') }), h('em', { text: 'Baixar CSV' })));
     });

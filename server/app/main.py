@@ -47,7 +47,7 @@ from .schemas import CONTEXTO_CAMPOS, Estatisticas, MapaColetivo, RespostaIn, Re
 
 log = logging.getLogger("alerta.api")
 
-APP_VERSION = "1.18.0"
+APP_VERSION = "1.19.0"
 
 
 def create_app(
@@ -99,6 +99,22 @@ def create_app(
         lifespan=lifespan,
     )
     app.add_middleware(GZipMiddleware, minimum_size=1024)
+
+    @app.middleware("http")
+    async def cors_publico(request: Request, call_next):
+        """CORS só para leitura (GET/HEAD/OPTIONS) em /publico/*: a página pública pode ficar no GitHub Pages
+        (outra origem) e ler estes dados agregados, que já são públicos. Nada com credencial nem escrita."""
+        if not request.url.path.startswith("/publico/"):
+            return await call_next(request)
+        if request.method == "OPTIONS":
+            resp = Response(status_code=204)
+            resp.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            resp.headers["Access-Control-Allow-Headers"] = request.headers.get("access-control-request-headers", "*")
+            resp.headers["Access-Control-Max-Age"] = "86400"
+        else:
+            resp = await call_next(request)
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        return resp
 
     app.state.settings = settings
     app.state.engine = engine
