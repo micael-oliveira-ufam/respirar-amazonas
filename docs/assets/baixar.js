@@ -89,7 +89,7 @@
     var el = limpar($('csv-lista'));
     var itens = manifesto ? manifesto.csv.filter(function (x) { return !x.dias || String(x.dias) === d; }) : [];
     if (!itens.length) {
-      el.appendChild(h('p', { class: 'sub', text: 'Os arquivos CSV ainda não foram publicados neste site para este período.' }));
+      el.appendChild(h('p', { class: 'sub', text: 'Os arquivos CSV serão disponibilizados aqui conforme os relatos forem publicados.' }));
       return;
     }
     itens.forEach(function (x) {

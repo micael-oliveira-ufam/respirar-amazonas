@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.20.3.
+
+## [1.20.3] - 2026-10-27
+
+### Corrigido
+- **Site do Pages sem relatos publicados parecia cinza/desativado** (pedido do usuário, 27/10/2026): sem `docs/dados/`, os gráficos, os KPIs e o mapa de relatos nem apareciam e a barra de estado ficava vermelha. Agora a página aparece completa, com gráficos e mapa zerados e a mensagem verde "Ainda não há relatos publicados neste site. Eles serão atualizados ao longo do tempo." O painel vazio (`painel_vazio.js`) é igual ao que o servidor devolve com o banco vazio; o teste `test_painel_vazio_js.py` compara os dois nos 4 períodos. O texto da lista de CSV também ficou neutro ("serão disponibilizados aqui conforme os relatos forem publicados").
+
 Nenhuma mudança desde a 1.20.2.
 
 ## [1.20.2] - 2026-10-27

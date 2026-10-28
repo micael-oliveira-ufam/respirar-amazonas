@@ -78,9 +78,10 @@
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (d) { dados = d; ultimoOk = Date.now(); desenhar(); })
       .catch(function () {
-        estado('erro', ESTATICO
-          ? 'Os relatos dos usuários ainda não foram publicados neste site (retrato de ' + dias + ' dia(s) indisponível).'
-          : 'Sem conexão com o servidor. Tentando de novo…');
+        if (ESTATICO) {
+          // Sem retrato publicado: mostra a página completa e zerada (não cinza), dizendo que os relatos virão.
+          dados = window.RespirarPainelVazio(dias); ultimoOk = Date.now(); desenhar();
+        } else estado('erro', 'Sem conexão com o servidor. Tentando de novo…');
       });
   }
   function estado(tipo, txt) {
@@ -88,6 +89,10 @@
   }
   function atualizarRelogio() {
     if (!ultimoOk) return;
+    if (ESTATICO && dados && dados.vazio) {
+      estado('ok', 'Ainda não há relatos publicados neste site. Eles serão atualizados ao longo do tempo.');
+      return;
+    }
     if (ESTATICO) {
       estado('ok', 'Retrato publicado em ' + (dataManaus(dados && dados.gerado_em) || 'data não informada') + ' (horário de Manaus). Não é ao vivo.');
       return;

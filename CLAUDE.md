@@ -529,6 +529,9 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 ### 4.48 Download direto do APK no Pages — versão 1.20.2
 - Pedido do usuário (27/10/2026): o botão de download aponta direto para `https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk`. Verificado pela API do GitHub (`gh api .../releases`): existe a Release com a tag **`v.1.20.0`** (com ponto depois do v, grafia do usuário, diferente da tag `v1.20.0` do Git local) e o asset `RespirAR-Amazonas-v1.20.0.apk` (54 541 255 bytes). NÃO verificado: o download em si (o ambiente não acessa github.com/releases por navegador) e a instalação do APK. Efeito: o site passa a oferecer SEMPRE esse arquivo até regenerar com `--apk-url`.
 
+### 4.49 Pages sem relatos não fica "apagado" — versão 1.20.3
+- Pedido do usuário (27/10/2026): o site não deve ficar cinza ou parecer desativado só porque ainda não há relatos; eles chegarão com o tempo. Regra de produto (reforça 1.4): **tela sem dados continua viva**, com gráficos zerados e mensagem clara, nunca estado de erro. Implementado no modo estático por `painel_vazio.js` (paridade testada contra `publico.montar` vazio). Se o servidor mudar o formato do painel, o teste de paridade falha e `painel_vazio.js` deve acompanhar.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).
