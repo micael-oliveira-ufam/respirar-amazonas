@@ -1,0 +1,79 @@
+rules_version = '2';
+
+// Regras do Firestore do RespirAR Amazonas (projeto Firebase "respirar-as").
+// Como publicar: console do Firebase > Firestore Database > Regras > colar este arquivo > Publicar.
+//
+// Princípio: o aplicativo (anônimo, sem login) só pode CRIAR uma resposta nova, com o formato exato
+// do questionário. NINGUÉM pelo aplicativo lê, altera ou apaga. A leitura é feita pela equipe, fora
+// do app, com a chave de conta de serviço (tool/publicar_dados_firestore.py), que ignora estas regras.
+//
+// Se o app ganhar um sintoma/pergunta novo, atualize a lista correspondente AQUI (o teste
+// tool/test_firestore_rules.py avisa quando o app e as regras deixam de coincidir).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /respostas/{id} {
+      allow read, update, delete: if false;
+      allow create: if respostaValida(id, request.resource.data);
+    }
+
+    // Tudo o mais é negado.
+    match /{outro=**} {
+      allow read, write: if false;
+    }
+
+    function perfilValido(p) {
+      return p is map
+        && p.keys().hasOnly(['idoso', 'gestante', 'crianca', 'doenca_respiratoria', 'doenca_cardiaca'])
+        && p.keys().hasAll(['idoso', 'gestante', 'crianca', 'doenca_respiratoria', 'doenca_cardiaca'])
+        && p.idoso is bool && p.gestante is bool && p.crianca is bool
+        && p.doenca_respiratoria is bool && p.doenca_cardiaca is bool;
+    }
+
+    function sintomasValidos(s) {
+      return s is map
+        && s.size() >= 1
+        && s.keys().hasOnly(['cough', 'throat', 'nose', 'wheeze', 'dyspnea', 'eyes', 'chest',
+                             'palpitation', 'headache', 'dizzy', 'fatigue'])
+        && s.values().hasOnly([0, 1, 2, 3]);
+    }
+
+    function contextoValido(c) {
+      return c is map
+        && c.keys().hasOnly(['local', 'fumaca_visivel', 'mascara', 'atividade_fisica_ar_livre',
+                             'ar_filtrado', 'trabalho_ar_livre', 'imunologica', 'medicacao_a_mao',
+                             'medicacao_nao_alivia', 'piorando'])
+        && (!('local' in c) || c.local in ['ar_livre', 'casa_janelas_abertas', 'casa_janelas_fechadas'])
+        && (!('mascara' in c) || c.mascara in ['nao_saiu', 'nao', 'cirurgica_pano', 'pff2_n95'])
+        && (!('fumaca_visivel' in c) || c.fumaca_visivel is bool)
+        && (!('atividade_fisica_ar_livre' in c) || c.atividade_fisica_ar_livre is bool)
+        && (!('ar_filtrado' in c) || c.ar_filtrado is bool)
+        && (!('trabalho_ar_livre' in c) || c.trabalho_ar_livre is bool)
+        && (!('imunologica' in c) || c.imunologica is bool)
+        && (!('medicacao_a_mao' in c) || c.medicacao_a_mao is bool)
+        && (!('medicacao_nao_alivia' in c) || c.medicacao_nao_alivia is bool)
+        && (!('piorando' in c) || c.piorando is bool);
+    }
+
+    function respostaValida(id, d) {
+      return d.keys().hasOnly(['submission_id', 'registrado_em', 'lat', 'lon', 'nivel', 'pontos',
+                               'exposicao', 'perfil', 'sintomas', 'app_version', 'contexto', 'recebido_em'])
+        && d.keys().hasAll(['submission_id', 'registrado_em', 'nivel', 'pontos', 'exposicao',
+                            'perfil', 'sintomas', 'recebido_em'])
+        && d.submission_id is string && d.submission_id == id && id.size() == 36
+        && d.registrado_em is string && d.registrado_em.size() <= 40
+        && d.recebido_em == request.time
+        && d.nivel in ['low', 'moderate', 'high', 'emergency']
+        && d.pontos is int && d.pontos >= 0 && d.pontos <= 500
+        && d.exposicao in ['under1h', 'between1and4h', 'over4h']
+        && perfilValido(d.perfil)
+        && sintomasValidos(d.sintomas)
+        // Localização: opcional, as duas juntas, dentro dos limites do planeta.
+        && (('lat' in d) == ('lon' in d))
+        && (!('lat' in d) || (d.lat is number && d.lat >= -90 && d.lat <= 90
+                              && d.lon is number && d.lon >= -180 && d.lon <= 180))
+        && (!('app_version' in d) || (d.app_version is string && d.app_version.size() <= 32))
+        && (!('contexto' in d) || contextoValido(d.contexto));
+    }
+  }
+}

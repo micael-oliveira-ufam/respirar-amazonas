@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'screens/splash_screen.dart';
 import 'services/air_alert_background.dart';
 import 'services/air_alert_service.dart';
+import 'services/answer_sink.dart';
 import 'services/api_config.dart';
 import 'theme/app_theme.dart';
 
@@ -18,6 +19,7 @@ Future<void> main() async {
   // Tela cheia: esconde as barras do sistema (voltam com um deslize na borda).
   await _enterFullscreen();
   await ApiConfig.load();
+  await FirebaseBootstrap.init(); // sem configuração do Firebase o app segue em modo local
   _startAirAlerts();
   runApp(const AlertaFumacaApp());
 }

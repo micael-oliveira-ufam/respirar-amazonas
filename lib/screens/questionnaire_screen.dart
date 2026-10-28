@@ -180,7 +180,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     });
   }
 
-  /// Envia a resposta ao servidor, sem identificação, depois que a pessoa disse "Sim".
+  /// Envia a resposta ao Firebase (Firestore), sem identificação, depois que a pessoa disse "Sim".
   Future<void> _shareAnswers() async {
     final data = _toShare;
     if (data == null || _shareState == _ShareState.sending) return;

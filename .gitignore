@@ -25,3 +25,10 @@ ios/
 
 # APK gerado e hashes (distribuídos pelo painel, nunca versionados)
 dist/
+
+# Configuração do Firebase do projeto (baixada do console; copiada para android/app pelo tool/apply_platform_config.py)
+firebase/google-services.json
+firebase/GoogleService-Info.plist
+# Chave de conta de serviço (acesso total de leitura ao banco: NUNCA versionar)
+firebase/*-firebase-adminsdk-*.json
+firebase/chave-servico.json

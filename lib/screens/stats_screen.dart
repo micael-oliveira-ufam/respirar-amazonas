@@ -36,7 +36,7 @@ class _StatsScreenState extends State<StatsScreen> {
   final _api = ApiClient(timeout: const Duration(seconds: 8));
   final _answers = LocalAnswerStore();
   final _cache = StatsCache();
-  late final AnswerSync _sync = AnswerSync(api: _api);
+  late final AnswerSync _sync = AnswerSync();
 
   /// Sempre preenchido logo após abrir (dados deste aparelho); o servidor só substitui.
   _StatsData? _data;
@@ -84,10 +84,10 @@ class _StatsScreenState extends State<StatsScreen> {
       if (!mounted) return;
       if (_data == null) setState(() => _data = _StatsData(snapshot: local));
 
-      if (!_api.isConfigured) return;
-
-      // Entrega o que ficou pendente sem travar a tela.
+      // Entrega o que ficou pendente (no Firestore) sem travar a tela.
       _sync.flush().then((_) => _loadPending()).catchError((Object _) {});
+
+      if (!_api.isConfigured) return;
 
       String? note;
       try {

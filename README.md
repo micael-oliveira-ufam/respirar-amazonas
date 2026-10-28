@@ -223,6 +223,23 @@ git add docs && git commit -m "Atualiza o site" && git push origin main
 3. Rode `gerar_pages.py` de novo e faça commit de `docs/` sempre que mudar `server/app/static_publico/` ou a versão. O servidor só é necessário no passo opcional do retrato.
 4. Para o site ler os dados ao vivo do servidor: `python3 tool/gerar_pages.py --api https://respirar-amazonas.cloud`.
 
+## Respostas no Firebase (Firestore)
+
+Desde a 1.21.0 o app grava as respostas compartilhadas no **Firestore** (projeto `respirar-as`), não mais no servidor FastAPI. Passo a passo (Android):
+
+1. **Console do Firebase:** Build > Firestore Database > criar o banco (escolha a região; ela define onde os dados ficam). Em *Regras*, cole `firebase/firestore.rules` e publique.
+2. **Arquivo do app:** salve o `google-services.json` baixado do console em `firebase/google-services.json` (fica fora do Git). `bash tool/gerar_apk.sh` o copia para `android/app/` e liga o plugin do Gradle. Sem o arquivo, o APK sai em modo local (não envia).
+3. **Chave para o site:** Configurações do projeto > Contas de serviço > *Gerar nova chave privada*; salve como `firebase/chave-servico.json` (ignorado pelo Git; quem tem essa chave lê TODO o banco).
+4. **Retrato do site:** `pip install google-cloud-firestore httpx -r server/requirements.txt` (uma vez) e depois
+   ```bash
+   python3 tool/gerar_pages.py                     # se mudou o site
+   python3 tool/publicar_dados_firestore.py        # lê o Firestore e grava docs/dados/
+   git add docs && git commit -m "Atualiza o retrato dos dados" && git push origin main
+   ```
+5. Recomendado no console: restringir a chave de API do Android ao pacote `br.ufam.fcf.respirar_amazonas` (Google Cloud > Credenciais) e ativar o App Check. A chave do `google-services.json` não é segredo (vai em todo APK); a proteção é feita pelas regras.
+
+Limites: iOS ainda sem Firebase (falta o `GoogleService-Info.plist`); as estatísticas dentro do app e o painel do servidor continuam lendo o servidor FastAPI, que não recebe mais respostas novas.
+
 ## Versionamento
 
 Uma versão só para o projeto (app e servidor), no padrão [SemVer](https://semver.org/lang/pt-BR/). A fonte é o arquivo `VERSION`; o `tool/versao.py` mantém as cópias sincronizadas (`pubspec.yaml`, `lib/data/app_info.dart`, `server/app/main.py`) e confere o `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)).

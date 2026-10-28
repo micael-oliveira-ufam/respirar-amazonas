@@ -7,7 +7,7 @@
 /// redigido pela equipe técnica a partir da LGPD e do comportamento real do app. Antes
 /// de divulgar ao público, a UFAM/FCF deve revisar, designar formalmente o controlador
 /// e o canal do encarregado (art. 41) e definir o prazo de retenção.
-const kLgpdTermsVersion = '1.4';
+const kLgpdTermsVersion = '1.5';
 
 class TermsSection {
   const TermsSection(this.title, this.paragraphs);
@@ -35,9 +35,10 @@ const kLgpdSections = <TermsSection>[
     'Localização aproximada (opcional): arredondada para cerca de 1 km, nunca a posição exata. '
         'Ela só é enviada se você aceitar compartilhar as respostas e permitir o acesso à '
         'localização do aparelho.',
-    'Não coletamos nome, telefone, e-mail, CPF, conta, identificador do aparelho nem endereço IP '
-        '(o servidor não grava o IP). Cada envio recebe um código aleatório que serve só para '
-        'evitar duplicidade se o envio for repetido.',
+    'Não coletamos nome, telefone, e-mail, CPF, conta nem identificador do aparelho, e o app não '
+        'grava o endereço IP. Como em qualquer serviço na internet, o provedor de nuvem (Google) '
+        'pode manter registros técnicos de conexão nos sistemas dele, conforme as políticas dele. '
+        'Cada envio recebe um código aleatório que serve só para evitar duplicidade se o envio for repetido.',
   ]),
   TermsSection('3. Para que usamos (finalidades)', [
     'Neste aparelho: calcular seu nível de risco, mostrar o histórico e as estatísticas locais.',
@@ -55,7 +56,7 @@ const kLgpdSections = <TermsSection>[
     'Para dados de saúde, usamos o seu consentimento específico e destacado (art. 11, I). '
         'Ao final de cada questionário, o app pergunta se você quer compartilhar aquelas respostas '
         'para estudos epidemiológicos. A decisão vale só para aquele questionário:',
-    '• "Sim": as respostas anônimas são enviadas ao servidor e, se você permitir o acesso à '
+    '• "Sim": as respostas anônimas são gravadas no Firebase (Firestore, serviço de nuvem do Google) e, se você permitir o acesso à '
         'localização, a área aproximada (~1 km) vai junto;\n'
         '• "Não": nada sai do aparelho.',
     'Aceitar este termo apenas confirma que você leu as regras. Ele NÃO autoriza nenhum envio. '
@@ -67,6 +68,10 @@ const kLgpdSections = <TermsSection>[
     'Divulgação: as estatísticas agregadas (gráficos, mapa e bairros) são públicas mesmo com '
         'poucas respostas, porque não trazem nome nem contato; a localização é sempre '
         'generalizada a ~1 km. Não há número mínimo de respostas para aparecer.',
+    'Onde ficam: as respostas compartilhadas são armazenadas no Firebase (Google). Os servidores '
+        'desse serviço podem estar fora do Brasil, o que caracteriza transferência internacional de '
+        'dados (LGPD, art. 33). O acesso de leitura é restrito à equipe do projeto; o aplicativo '
+        'só consegue gravar novas respostas, nunca ler as de outras pessoas.',
     'Limitação honesta: nenhum sistema é totalmente seguro, e dados anonimizados podem, em '
         'situações raras (por exemplo, poucas pessoas numa área pequena), permitir inferências. '
         'Por isso a localização é opcional.',

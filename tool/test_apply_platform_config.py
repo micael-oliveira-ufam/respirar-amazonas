@@ -9,7 +9,14 @@ import xml.dom.minidom as minidom
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from apply_platform_config import patch_gradle, patch_manifest, patch_plist  # noqa: E402
+from apply_platform_config import (  # noqa: E402
+    configurar_firebase,
+    patch_app_gradle_firebase,
+    patch_gradle,
+    patch_manifest,
+    patch_plist,
+    patch_settings_gradle,
+)
 
 # Modelo equivalente ao gerado por `flutter create` (com o <queries> padrão).
 MANIFEST_WITH_QUERIES = """<manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -171,6 +178,79 @@ class GradleDesugaring(unittest.TestCase):
     def test_sem_compileoptions_falha_claramente(self):
         with self.assertRaises(ValueError):
             patch_gradle("android { }", kts=True)
+
+
+SETTINGS_KTS = """pluginManagement { }
+
+plugins {
+    id("dev.flutter.flutter-plugin-loader") version "1.0.0"
+    id("com.android.application") version "8.9.1" apply false
+}
+
+include(":app")
+"""
+
+SETTINGS_GROOVY = """plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+}
+"""
+
+
+class GradleFirebase(unittest.TestCase):
+    def test_settings_kts_declara_sem_aplicar_e_e_idempotente(self):
+        patched, added = patch_settings_gradle(SETTINGS_KTS, kts=True)
+        self.assertEqual(len(added), 1)
+        self.assertIn('id("com.google.gms.google-services") version "4.5.0" apply false', patched)
+        self.assertEqual(patch_settings_gradle(patched, kts=True), (patched, []))
+
+    def test_settings_groovy(self):
+        patched, _ = patch_settings_gradle(SETTINGS_GROOVY, kts=False)
+        self.assertIn('id "com.google.gms.google-services" version "4.5.0" apply false', patched)
+
+    def test_app_aplica_o_plugin_uma_vez(self):
+        patched, added = patch_app_gradle_firebase(GRADLE_KTS, kts=True)
+        self.assertEqual(len(added), 1)
+        self.assertEqual(patched.count("com.google.gms.google-services"), 1)
+        self.assertEqual(patch_app_gradle_firebase(patched, kts=True)[1], [])
+
+    def test_sem_bloco_plugins_falha_claramente(self):
+        with self.assertRaises(ValueError):
+            patch_settings_gradle("include(':app')", kts=True)
+        with self.assertRaises(ValueError):
+            patch_app_gradle_firebase("android { }", kts=True)
+
+    def test_sem_google_services_json_nada_e_aplicado(self):
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            (root / "android/app").mkdir(parents=True)
+            (root / "android/settings.gradle.kts").write_text(SETTINGS_KTS)
+            app = root / "android/app/build.gradle.kts"
+            app.write_text(GRADLE_KTS)
+            self.assertEqual(configurar_firebase(root, app, False), [])
+            self.assertNotIn("google-services", app.read_text())
+            self.assertFalse((root / "android/app/google-services.json").exists())
+
+    def test_com_google_services_json_copia_e_aplica(self):
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            (root / "android/app").mkdir(parents=True)
+            (root / "firebase").mkdir()
+            (root / "firebase/google-services.json").write_text('{"x": 1}')
+            (root / "android/settings.gradle.kts").write_text(SETTINGS_KTS)
+            app = root / "android/app/build.gradle.kts"
+            app.write_text(GRADLE_KTS)
+            configurar_firebase(root, app, False)
+            self.assertEqual((root / "android/app/google-services.json").read_text(), '{"x": 1}')
+            self.assertIn("com.google.gms.google-services", app.read_text())
+            self.assertIn("com.google.gms.google-services", (root / "android/settings.gradle.kts").read_text())
+            # segunda passada: nada a fazer
+            self.assertTrue(all(not r for r in configurar_firebase(root, app, True)))
 
 
 if __name__ == "__main__":

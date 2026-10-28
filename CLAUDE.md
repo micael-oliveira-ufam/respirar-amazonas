@@ -532,6 +532,15 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 ### 4.49 Pages sem relatos não fica "apagado" — versão 1.20.3
 - Pedido do usuário (27/10/2026): o site não deve ficar cinza ou parecer desativado só porque ainda não há relatos; eles chegarão com o tempo. Regra de produto (reforça 1.4): **tela sem dados continua viva**, com gráficos zerados e mensagem clara, nunca estado de erro. Implementado no modo estático por `painel_vazio.js` (paridade testada contra `publico.montar` vazio). Se o servidor mudar o formato do painel, o teste de paridade falha e `painel_vazio.js` deve acompanhar.
 
+### 4.50 Respostas no Firebase (Firestore) — versão 1.21.0
+- Pedido do usuário (27/10/2026): "Integre o armazenamento das respostas do aplicativo ao firebase." Escolhas dele: destino **só Firestore** (o app não faz mais POST ao FastAPI) e site por **retrato via script**. Projeto Firebase `respirar-as` (número 456508280412), app Android `br.ufam.fcf.respirar_amazonas` (conferido no `google-services.json`).
+- App: `lib/services/answer_sink.dart` (`AnswerSink`, `FirestoreAnswerSink`, `FirebaseBootstrap`); `AnswerSync` agora recebe um `AnswerSink`. Doc id = `submission_id`; regras só deixam criar. Cache em disco do Firestore desligado. Erros: `permission-denied`/`invalid-argument`/`already-exists`/`failed-precondition` = definitivo; resto (rede, prazo) = fila. `FirebaseBootstrap.init()` em `main()` falha em silêncio: sem configuração (iOS) o app fica em modo local.
+- `google-services.json` NÃO é versionado (repositório público; a chave de API do Firebase não é segredo, mas fica fora do Git por higiene). Vem de `firebase/google-services.json`. `tool/apply_platform_config.py` só liga o plugin Gradle quando esse arquivo existe (senão o build quebraria).
+- Versões: `firebase_core ^5.1.0`, `cloud_firestore ^7.1.0` (notas de lançamento do Firebase para Flutter, entrada de 22/10/2026, BoM Android 35.1.0); plugin google-services 4.5.0 (do console do usuário). **Nada disso foi compilado.**
+- `tool/publicar_dados_firestore.py` reutiliza `app.main` em memória (SQLite) + `tool/publicar_dados_pages.py`; `criado_em` é trocado por `recebido_em` (senão os períodos errariam).
+- **Verificado:** 9 testes do script (documentos fictícios, geocoder e ar simulados), 6 de coerência das regras com app/servidor, 7 do patch Gradle. **NÃO verificado:** o Dart (nem `flutter pub get`), as regras do Firestore em execução (sem emulador aqui; a sintaxe foi escrita pela documentação, não executada), build Gradle com o plugin google-services, `google-cloud-firestore` real contra o projeto, gravação do APK no Firestore, a qualidade do ar a partir da máquina do usuário.
+- Pendências ligadas: iOS (`GoogleService-Info.plist` + `Podfile`), estatísticas no app e painel do servidor ainda leem o FastAPI, restringir a chave de API, App Check, região do Firestore e retenção definidas pela instituição.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

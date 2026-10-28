@@ -12,7 +12,25 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
-Nenhuma mudança desde a 1.20.3.
+Nenhuma mudança desde a 1.21.0.
+
+## [1.21.0] - 2026-10-27
+
+### Adicionado
+- **Respostas do app gravadas no Firebase (Firestore)** (pedido do usuário, 27/10/2026: "Integre o armazenamento das respostas do aplicativo ao firebase"; escolha: "Só Firestore"). Ao dizer "Sim" no fim do questionário, o app grava a resposta em `respostas/{submission_id}` no projeto `respirar-as` (`lib/services/answer_sink.dart`, `FirestoreAnswerSink`); o app **não envia mais ao servidor FastAPI**. O `submission_id` é o id do documento, então reenviar a mesma resposta não duplica. A fila de reenvio local (`AnswerSync`) continua: falha de rede/prazo = fica na fila; recusa do Firebase (`permission-denied`, `invalid-argument`, `already-exists`, `failed-precondition`) = descartada, sem repetir. Cache em disco do Firestore desligado (a fila é a do app).
+- **`firebase/firestore.rules`**: o app só pode CRIAR um documento com o formato exato do questionário (campos, tipos, faixas e listas de valores iguais às do servidor); leitura, alteração e exclusão pelo app são negadas. `tool/test_firestore_rules.py` confere que as listas das regras coincidem com as do app e do servidor (NÃO executa as regras: isso exige o emulador do Firebase).
+- **`tool/publicar_dados_firestore.py`** ("retrato via script"): lê o Firestore com uma chave de conta de serviço (fora do Git), passa cada documento pela MESMA validação do servidor num SQLite temporário, usa o `recebido_em` do Firebase como data de chegada (para os filtros de 1/7/30/90 dias), resolve bairros de Manaus (Nominatim) e grava `docs/dados/` no mesmo formato do `publicar_dados_pages.py`. Tudo ou nada; documentos inválidos são contados e nunca publicados. 9 testes (`tool/test_publicar_dados_firestore.py`).
+- **Build Android com Firebase**: `tool/apply_platform_config.py` copia `firebase/google-services.json` (ignorado pelo Git) para `android/app/` e liga o plugin `com.google.gms.google-services` 4.5.0 (versão do console do usuário) no Gradle. Sem o arquivo, nada do Firebase é aplicado e o APK sai em modo local.
+- Dependências do app: `firebase_core ^5.1.0` e `cloud_firestore ^7.1.0` (versões das notas de lançamento do Firebase para Flutter, BoM Android 35.1.0, lidas em 27/10/2026; **não compiladas**).
+
+### Alterado
+- Termo LGPD 1.5 (reaceite): os dados compartilhados ficam no Firebase (Google), possível transferência internacional (art. 33), acesso de leitura restrito à equipe; a frase "o servidor não grava o IP" virou "o app não grava o IP" (o provedor de nuvem pode manter registros técnicos).
+- A tela de estatísticas entrega a fila pendente ao Firestore mesmo sem servidor configurado.
+
+### Atenção (limites conhecidos)
+- **iOS não usa Firebase ainda** (falta o `GoogleService-Info.plist`): no iOS o app segue em modo local, sem o cartão de compartilhamento.
+- As **estatísticas dentro do app** e o **painel do servidor** continuam lendo o servidor FastAPI, que deixa de receber respostas novas. O site do Pages passa a ser alimentado pelo script acima.
+- Reenvio de uma resposta já gravada (confirmação perdida na rede) volta como `permission-denied` e é descartado: o dado já está no Firestore, mas a tela diz "não compartilhado" nesse caso raro.
 
 ## [1.20.3] - 2026-10-27
 

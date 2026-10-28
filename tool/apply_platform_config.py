@@ -123,6 +123,40 @@ def patch_gradle(text: str, kts: bool) -> tuple[str, list[str]]:
     return text, added
 
 
+#: Plugin Gradle do Firebase (versão do console do Firebase do usuário em 27/10/2026; não testada aqui).
+GOOGLE_SERVICES_VERSION = "4.5.0"
+#: Onde o usuário guarda o arquivo baixado do console (FORA do Git: ver .gitignore).
+GOOGLE_SERVICES_ORIGEM = Path("firebase/google-services.json")
+GOOGLE_SERVICES_DESTINO = Path("android/app/google-services.json")
+
+
+def patch_settings_gradle(text: str, kts: bool) -> tuple[str, list[str]]:
+    """Declara o plugin google-services (sem aplicar) no bloco `plugins` de settings.gradle(.kts)."""
+    if "com.google.gms.google-services" in text:
+        return text, []
+    achou = re.search(r"^plugins\s*\{", text, re.M)
+    if achou is None:
+        raise ValueError("settings.gradle sem bloco plugins (template de Flutter inesperado).")
+    linha = (
+        f'id("com.google.gms.google-services") version "{GOOGLE_SERVICES_VERSION}" apply false'
+        if kts
+        else f'id "com.google.gms.google-services" version "{GOOGLE_SERVICES_VERSION}" apply false'
+    )
+    return text[: achou.end()] + f"\n    {linha}" + text[achou.end():], ["google-services (settings)"]
+
+
+def patch_app_gradle_firebase(text: str, kts: bool) -> tuple[str, list[str]]:
+    """Aplica o plugin google-services no bloco `plugins` de android/app/build.gradle(.kts)."""
+    if "com.google.gms.google-services" in text:
+        return text, []
+    achou = re.search(r"^plugins\s*\{", text, re.M)
+    if achou is None:
+        raise ValueError("build.gradle do app sem bloco plugins.")
+    linha = 'id("com.google.gms.google-services")' if kts else 'id "com.google.gms.google-services"'
+    return text[: achou.end()] + f"\n    {linha}" + text[achou.end():], ["google-services (app)"]
+
+
+
 def patch_plist(text: str) -> tuple[str, list[str]]:
     added: list[str] = []
     entries = ""
@@ -173,6 +207,33 @@ def process(path: Path, patcher, check_only: bool) -> list[str] | None:
     return added
 
 
+def configurar_firebase(root: Path, gradle_app: Path, check_only: bool) -> list[list[str] | None]:
+    """Liga o Firebase no Android SE `firebase/google-services.json` existir; senão o app fica em modo local.
+
+    O arquivo vem do console do Firebase e fica fora do Git. Sem ele, NADA do Firebase é aplicado
+    (o plugin google-services quebraria o build sem o arquivo) e o APK sai em modo local.
+    """
+    origem = root / GOOGLE_SERVICES_ORIGEM
+    if not origem.exists():
+        print(f"[firebase] {GOOGLE_SERVICES_ORIGEM} ausente: o APK sai em MODO LOCAL (não envia respostas).")
+        return []
+    destino = root / GOOGLE_SERVICES_DESTINO
+    copiado: list[str] = []
+    if not destino.exists() or destino.read_bytes() != origem.read_bytes():
+        copiado = ["google-services.json"]
+        if not check_only:
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            destino.write_bytes(origem.read_bytes())
+    print(f"[{GOOGLE_SERVICES_DESTINO}] " + (f"{'faltava' if check_only else 'copiado'}: google-services.json" if copiado else "já estava correto"))
+    settings_kts = root / "android/settings.gradle.kts"
+    settings = settings_kts if settings_kts.exists() else root / "android/settings.gradle"
+    return [
+        copiado,
+        process(settings, lambda t: patch_settings_gradle(t, kts=settings.suffix == ".kts"), check_only),
+        process(gradle_app, lambda t: patch_app_gradle_firebase(t, kts=gradle_app.suffix == ".kts"), check_only),
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("root", nargs="?", default=".", help="raiz do projeto Flutter")
@@ -187,6 +248,7 @@ def main() -> int:
         process(gradle, lambda t: patch_gradle(t, kts=gradle.suffix == ".kts"), args.check),
         process(root / PLIST, patch_plist, args.check),
     ]
+    results += configurar_firebase(root, gradle, args.check)
     if any(r is None for r in results):
         return 2
     if args.check and any(results):
