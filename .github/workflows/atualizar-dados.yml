@@ -1,0 +1,70 @@
+# Atualiza o retrato público do site (docs/dados/) a partir do Firestore, a cada 6 horas.
+#
+# Precisa do segredo FIREBASE_SERVICE_ACCOUNT (Settings > Secrets and variables > Actions): o conteúdo
+# do JSON de uma conta de serviço SOMENTE LEITURA do projeto respirar-as. Ver README, seção
+# "Atualização automática (GitHub Actions)". Teste manual: aba Actions > este workflow > Run workflow.
+#
+# Este workflow NÃO compila o APK e NÃO guarda APK no repositório (continua valendo a regra do CLAUDE.md).
+name: Atualizar dados do site
+
+on:
+  schedule:
+    - cron: "17 */6 * * *" # minuto 17 de 0h, 6h, 12h e 18h UTC (fora da hora cheia, que costuma atrasar)
+  workflow_dispatch:
+
+# Uma execução por vez: duas ao mesmo tempo disputariam o mesmo push.
+concurrency:
+  group: atualizar-dados
+  cancel-in-progress: false
+
+permissions:
+  contents: write # grava o commit em docs/dados e firebase/cache-bairros.json
+  pages: write # pede a publicação do Pages depois do push
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install google-cloud-firestore httpx -r server/requirements.txt
+
+      - name: Gerar o retrato a partir do Firestore
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Segredo FIREBASE_SERVICE_ACCOUNT não cadastrado (ver README)." >&2
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/chave-servico.json"
+          python3 tool/publicar_dados_firestore.py --chave "$RUNNER_TEMP/chave-servico.json"
+          rm -f "$RUNNER_TEMP/chave-servico.json"
+
+      - name: Publicar (commit e push, só se algo mudou)
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/dados firebase/cache-bairros.json
+          if git diff --cached --quiet; then
+            echo "Nada mudou; nenhum commit."
+            exit 0
+          fi
+          git commit -m "Atualiza o retrato dos dados (automático)"
+          git push origin HEAD:main || { git pull --rebase origin main && git push origin HEAD:main; }
+
+      - name: Pedir a publicação do Pages
+        # Um push feito com o GITHUB_TOKEN pode não disparar a publicação sozinho; este pedido garante.
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"

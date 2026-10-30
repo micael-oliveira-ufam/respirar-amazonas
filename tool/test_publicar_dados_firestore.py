@@ -142,3 +142,30 @@ def test_falha_do_ar_nao_altera_o_que_ja_estava_publicado(tmp_path):
 def test_chave_ausente_da_mensagem_clara(tmp_path, capsys):
     assert pdf.main(["--chave", str(tmp_path / "nao-existe.json"), "--saida", str(tmp_path / "x")]) == 1
     assert "chave de conta de serviço não encontrada" in capsys.readouterr().err
+
+
+def test_cache_de_bairros_evita_nova_consulta_e_e_estavel(tmp_path):
+    cache = tmp_path / "cache.json"
+    consultas = []
+
+    def geo_contador(lat, lon):
+        consultas.append((lat, lon))
+        return {"bairro": "Centro", "cidade": "Manaus"}
+
+    docs = [doc(), doc()]
+    gerar(tmp_path, docs, geocoder=geo_contador, cache_bairros=cache)
+    assert len(consultas) == 1  # as duas respostas caem na mesma área de ~1 km
+    primeiro = cache.read_text(encoding="utf-8")
+    assert json.loads(primeiro) == [{"lat": -3.12, "lon": -60.02, "bairro": "Centro", "cidade": "Manaus"}]
+
+    consultas.clear()
+    _, saida = gerar(tmp_path, docs, geocoder=geo_contador, cache_bairros=cache)
+    assert consultas == []  # veio do cache
+    assert cache.read_text(encoding="utf-8") == primeiro  # sem mudança: o Git não vê diferença
+    assert "Centro" in (saida / "csv" / "bairros-30d.csv").read_text(encoding="utf-8")
+
+
+def test_falha_do_geocoder_nao_grava_no_cache(tmp_path):
+    cache = tmp_path / "cache.json"
+    gerar(tmp_path, [doc()], geocoder=lambda a, b: None, cache_bairros=cache)
+    assert json.loads(cache.read_text(encoding="utf-8")) == []

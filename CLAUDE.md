@@ -67,7 +67,7 @@ Exemplo de fecho:
 
 ### 1.4 Regras do repositório
 
-- **Sem GitHub Actions e sem APK no repositório.** O usuário pediu explicitamente: o repositório não compila o APK nem usa Actions. O APK é gerado localmente por `tool/gerar_apk.sh`. Não recriar `.github/workflows/` nem commitar `*.apk`.
+- **Sem APK no repositório e sem compilar APK em Actions.** O usuário pediu (20/10/2026) que o repositório não compile o APK nem use Actions; em 29/10/2026 ele AUTORIZOU um único workflow, `.github/workflows/atualizar-dados.yml` (atualiza `docs/dados` a partir do Firestore a cada 6 h). Qualquer outro workflow, e qualquer workflow que compile ou guarde APK, continua proibido sem nova autorização. O APK é gerado localmente por `tool/gerar_apk.sh`. Não commitar `*.apk`.
 - **Nunca commitar segredos.** `.env`, senhas, `ADMIN_TOKEN`, chaves e dados reais de usuários ficam fora do Git (ver `.gitignore`). Se um segredo aparecer em saída ou arquivo, avisar o usuário.
 - **Nome do app:** exibido como **RespirAR Amazonas** (desde a 1.3.0; antes era "Alerta Fumaça AM"). O pacote Dart é `respirar_amazonas` e o repositório é `respirar-amazonas` (desde a 1.3.1). Ao trocar o nome de novo, atualizar `appDisplayName`, `tool/apply_platform_config.py`, textos do app e do servidor, README e subir `kLgpdTermsVersion` (o nome aparece no termo).
 - **Tela cheia:** o app abre em modo imersivo (`immersiveSticky`), reaplicado quando o app volta ao primeiro plano.
@@ -551,6 +551,12 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - Pedido do usuário (29/10/2026): todos os comandos citados no README, para reprodutibilidade. Seção "Respostas no Firebase" reescrita em A a F (clone, console, arquivos JSON, APK, retrato, publicação). Causa de o usuário ter rodado `git add` numa pasta sem Git: o zip entregue não leva `.git` (explicado no README).
 - Pergunta do usuário: botão no Pages para atualizar os dados do Firebase. Resposta dada: não direto (Pages é estático; a chave de serviço não pode ir à página; regra 1.4 proíbe GitHub Actions). Alternativas apresentadas: agregados publicados em um documento do Firestore lido pelo site (exige tarefa agendada fora do Pages, possivelmente plano pago do Firebase: NÃO verificado) ou rodar o script de tempos em tempos no Mac. Decisão do usuário pendente.
 
+### 4.54 Atualização automática do site (GitHub Actions) — versão 1.22.0
+- Pedido do usuário (29/10/2026): automação no GitHub Actions para atualizar o site com os dados do Firestore. Escolhas: **a cada 6 horas**, **cache de bairros no repositório**; ele também revogou, para este workflow, a regra "sem Actions" (ver 1.4).
+- `.github/workflows/atualizar-dados.yml` (cron `17 */6 * * *` UTC + manual; `permissions: contents: write, pages: write`; segredo `FIREBASE_SERVICE_ACCOUNT`; commit só se mudou; passo final pede a publicação do Pages pela API, porque push com o `GITHUB_TOKEN` pode não disparar o Pages — **comportamento não verificado**). `firebase/cache-bairros.json` guarda área de ~1 km → bairro (público; só áreas com respostas).
+- **NÃO verificado:** a execução real do workflow (só o GitHub executa), as versões `actions/checkout@v4` e `actions/setup-python@v5` (escolhidas de memória; não consegui consultar), o nome exato do papel de leitura do Firestore (`roles/datastore.viewer`), o acesso do runner ao Firestore/Open-Meteo/Nominatim, a desativação do agendamento após 60 dias sem atividade, custo (esperado gratuito em repositório público; conferir nos termos).
+- Push de arquivo em `.github/workflows/` exige que o token do GitHub tenha o escopo `workflow`; se o push do sandbox for recusado, o usuário envia pelo Mac.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).
@@ -570,7 +576,7 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 1. Português, detalhado, **sem inventar**; separar verificado de não verificado.
 2. Dart não compila aqui: peça `flutter analyze` e `flutter test` e use os resultados reais.
 3. Mudança pequena e rastreável ao pedido; registre no `CHANGELOG.md`; versão por `tool/versao.py`.
-4. Sem Actions, sem APK no Git, sem segredos.
+4. Sem APK no Git, sem segredos; só o workflow `atualizar-dados.yml` é autorizado (nada de CI de build).
 5. Tags não sobem do sandbox: avise o usuário.
 6. Texto de saúde: rotule a verificação; sinalize o que pode causar dano.
 7. **Termine sempre perguntando os próximos passos, com 2 a 4 escolhas e uma recomendada.**

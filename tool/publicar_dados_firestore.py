@@ -12,7 +12,8 @@ Como funciona (para ser reproduzível):
     Firestore; a chave é secreta e fica FORA do Git, ver .gitignore).
  2. Carrega cada documento num banco SQLite temporário passando pela MESMA validação e gravação do
     servidor (POST /respostas em memória). Documento inválido é contado e IGNORADO, nunca publicado.
- 3. Resolve o bairro das áreas de Manaus pelo Nominatim (1 consulta/s; pule com --sem-bairros).
+ 3. Resolve o bairro das áreas de Manaus: primeiro pelo cache firebase/cache-bairros.json (versionado), só
+    o que falta vai ao Nominatim (1 consulta/s; pule tudo com --sem-bairros).
  4. Gera os mesmos arquivos de tool/publicar_dados_pages.py (painel-N.json, csv/*.csv, manifest.json)
     com as MESMAS regras de agregação do painel do servidor (app/publico.py, app/exportacao.py).
 Tudo ou nada: se algo falhar, docs/dados/ NÃO é alterada. Nenhuma resposta individual é publicada,
@@ -39,6 +40,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "server"))
 
 CHAVE_PADRAO = RAIZ / "firebase" / "chave-servico.json"
+CACHE_BAIRROS_PADRAO = RAIZ / "firebase" / "cache-bairros.json"
 COLECAO = "respostas"
 #: Campos que o app não envia no formato do servidor (são metadados do Firestore).
 CAMPOS_SO_DO_FIRESTORE = ("recebido_em",)
@@ -114,8 +116,47 @@ def carregar_no_banco(client, docs: Iterable[tuple[str, dict[str, Any]]], sessio
     return {"novos": novos, "duplicados": duplicados, "recusados": recusados}
 
 
+def carregar_cache_bairros(session_factory, caminho: Path | None) -> int:
+    """Põe no banco temporário os bairros já descobertos (arquivo versionado), poupando o Nominatim."""
+    import json
+    from decimal import Decimal
+
+    from app.models import CelulaBairro
+
+    if caminho is None or not caminho.exists():
+        return 0
+    itens = json.loads(caminho.read_text(encoding="utf-8"))
+    with session_factory() as session:
+        for i in itens:
+            session.merge(CelulaBairro(lat=Decimal(str(i["lat"])), lon=Decimal(str(i["lon"])),
+                                       bairro=i.get("bairro"), cidade=i.get("cidade")))
+        session.commit()
+    return len(itens)
+
+
+def salvar_cache_bairros(session_factory, caminho: Path | None) -> int:
+    """Grava todos os bairros conhecidos em ordem fixa (sem mudança = o Git não vê diferença)."""
+    import json
+
+    from sqlalchemy import select
+
+    from app.models import CelulaBairro
+
+    if caminho is None:
+        return 0
+    with session_factory() as session:
+        linhas = session.execute(select(CelulaBairro.lat, CelulaBairro.lon, CelulaBairro.bairro, CelulaBairro.cidade)).all()
+    itens = sorted(({"lat": float(a), "lon": float(b), "bairro": c, "cidade": d} for a, b, c, d in linhas),
+                   key=lambda x: (x["lat"], x["lon"]))
+    texto = json.dumps(itens, ensure_ascii=False, indent=1) + "\n"
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    if not caminho.exists() or caminho.read_text(encoding="utf-8") != texto:
+        caminho.write_text(texto, encoding="utf-8")
+    return len(itens)
+
+
 def gerar(documentos: list[tuple[str, dict[str, Any]]], saida: Path, projeto: str, *, geocoder=None,
-          qualidade_ar=None, resolver_bairros: bool = True, agora: Callable[[], dt.datetime] | None = None) -> dict:
+          qualidade_ar=None, resolver_bairros: bool = True, cache_bairros: Path | None = None, agora: Callable[[], dt.datetime] | None = None) -> dict:
     from fastapi.testclient import TestClient
 
     from app import bairros as bairros_mod
@@ -132,8 +173,10 @@ def gerar(documentos: list[tuple[str, dict[str, Any]]], saida: Path, projeto: st
     with TestClient(app) as client:
         resumo = carregar_no_banco(client, documentos, app.state.session_factory)
         if resolver_bairros:
+            resumo["bairros_do_cache"] = carregar_cache_bairros(app.state.session_factory, cache_bairros)
             geo = geocoder or bairros_mod.nominatim(settings, "firestore")
             resumo["bairros_resolvidos"] = bairros_mod.resolver_pendentes(app.state.session_factory, geo, limite=500)
+            resumo["bairros_no_cache"] = salvar_cache_bairros(app.state.session_factory, cache_bairros)
 
         def buscar(url: str) -> bytes:
             caminho = url.split("//", 1)[1].split("/", 1)[1]  # firestore://projeto/publico/... -> publico/...
@@ -154,6 +197,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--chave", default=os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or str(CHAVE_PADRAO),
                     help="JSON da conta de serviço (padrão: firebase/chave-servico.json)")
     ap.add_argument("--saida", default=str(RAIZ / "docs" / "dados"))
+    ap.add_argument("--cache-bairros", default=str(CACHE_BAIRROS_PADRAO),
+                    help="arquivo com bairros já descobertos (versionado; evita repetir consultas ao Nominatim)")
     ap.add_argument("--sem-bairros", action="store_true", help="não consulta o Nominatim (ranking de bairros fica vazio)")
     a = ap.parse_args(argv)
     chave = Path(a.chave)
@@ -164,7 +209,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     try:
         docs, projeto = ler_firestore(chave)
-        m = gerar(docs, Path(a.saida), projeto, resolver_bairros=not a.sem_bairros)
+        m = gerar(docs, Path(a.saida), projeto, resolver_bairros=not a.sem_bairros, cache_bairros=Path(a.cache_bairros))
     except Exception as e:  # noqa: BLE001 - qualquer falha: nada é alterado
         print(f"FALHOU: {type(e).__name__}: {e}\ndocs/dados/ NÃO foi alterada.", file=sys.stderr)
         return 1

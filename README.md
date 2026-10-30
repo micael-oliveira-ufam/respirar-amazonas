@@ -292,11 +292,28 @@ git tag -a vX.Y.Z -m "Versão X.Y.Z"
 git push origin main vX.Y.Z
 ```
 
+### G. Atualização automática (GitHub Actions)
+
+O workflow `.github/workflows/atualizar-dados.yml` repete o passo E **a cada 6 horas** (e quando você mandar rodar), no servidor do GitHub, sem depender do seu computador. Ele só faz commit se algo mudou (a qualidade do ar muda sempre, então na prática há até 4 commits por dia). Não compila APK nem guarda APK no repositório.
+
+Configuração (uma vez):
+1. **Conta de serviço só de leitura** (recomendado em vez da chave de administrador): Google Cloud > IAM e administrador > Contas de serviço > *Criar conta de serviço* (projeto `respirar-as`) > conceda o papel de leitura do Firestore (o papel "Leitor do Cloud Datastore", `roles/datastore.viewer`; confirme o nome no console) > aba *Chaves* > *Adicionar chave* > JSON.
+2. **Segredo no GitHub:** repositório > Settings > Secrets and variables > Actions > *New repository secret* > nome `FIREBASE_SERVICE_ACCOUNT` > valor = **todo o conteúdo** do JSON baixado. Depois apague o arquivo baixado ou guarde-o fora do repositório.
+3. **Permissão de escrita do workflow:** Settings > Actions > General > *Workflow permissions* > *Read and write permissions* (o próprio arquivo já pede `contents: write`, mas essa opção do repositório pode bloquear).
+4. **Publicar o workflow:** `git pull origin main` (o arquivo vem no clone) e confira que `.github/workflows/atualizar-dados.yml` existe no GitHub.
+5. **Teste manual:** aba *Actions* > *Atualizar dados do site* > *Run workflow*. O passo "Gerar o retrato" deve imprimir `Lidos N documentos` e o "Publicar" deve criar o commit `Atualiza o retrato dos dados (automático)`.
+
+Cuidados:
+- Quem tiver permissão de escrita no repositório pode alterar o workflow e ler o segredo. Mantenha poucos colaboradores e a conta de serviço só de leitura.
+- Os bairros ficam em `firebase/cache-bairros.json` (versionado, público): relação "área de ~1 km → bairro", só das áreas com respostas. Evita repetir consultas ao Nominatim a cada execução.
+- O GitHub costuma desativar workflows agendados de repositórios públicos sem atividade por 60 dias; se isso acontecer, reative na aba *Actions*. (Não verifiquei se os commits do próprio workflow contam como atividade.)
+- Atualizar manualmente (passo E) continua funcionando; rode `git pull origin main` antes para pegar os commits automáticos.
+
 ### Limites
 
 - **iOS** ainda sem Firebase (falta o `GoogleService-Info.plist`): no iOS o app fica em modo local.
 - As **estatísticas dentro do app** e o **painel do servidor** continuam lendo o servidor FastAPI, que não recebe mais respostas novas.
-- O site do Pages **não atualiza sozinho**: é um retrato gerado pelo passo E (Pages só serve arquivos; a chave de serviço nunca pode ficar numa página pública).
+- O site do Pages é um **retrato** (Pages só serve arquivos; a chave de serviço nunca pode ficar numa página pública). Ele se atualiza pelo passo E ou, sozinho, pelo workflow da próxima seção.
 - Testado aqui: o script do passo E (documentos fictícios), a coerência das regras com o app e o patch do Gradle. **Não testado:** Dart, regras em execução, build Gradle com o plugin, leitura do Firestore real.
 
 ## Versionamento
@@ -321,7 +338,7 @@ Histórico de versões: `CHANGELOG.md`. Tags: `v1.0.0` (commit `eb29899`) e `v1.
 
 ## Testes
 
-Não há GitHub Actions neste repositório. Rode localmente:
+O único workflow do repositório (`.github/workflows/atualizar-dados.yml`) atualiza os dados do site; ele não roda testes nem compila APK. Rode os testes localmente:
 
 ```bash
 # servidor (SQLite por padrão; defina TEST_DATABASE_URL para rodar também em PostgreSQL)

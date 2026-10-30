@@ -12,7 +12,17 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
-Nenhuma mudança desde a 1.21.3.
+Nenhuma mudança desde a 1.22.0.
+
+## [1.22.0] - 2026-10-29
+
+### Adicionado
+- **Atualização automática do site pelo GitHub Actions** (pedido do usuário, 29/10/2026: "gerar uma automação no GitHub Actions para sempre atualizar o site com os dados do Firestore"; escolhas: a cada 6 horas, cache de bairros no repositório). `.github/workflows/atualizar-dados.yml`: agenda `17 */6 * * *` UTC + execução manual, lê o segredo `FIREBASE_SERVICE_ACCOUNT`, roda `tool/publicar_dados_firestore.py`, faz commit/push de `docs/dados` e `firebase/cache-bairros.json` só se mudou e pede a publicação do Pages. Sem APK e sem Flutter no workflow.
+- **`firebase/cache-bairros.json`** (novo `--cache-bairros` no script): bairros já descobertos pelo Nominatim, em ordem fixa; as execuções seguintes só consultam áreas novas (política de 1 consulta/s). Falha do Nominatim não grava no cache.
+- `tool/test_workflow_atualizar_dados.py` (estrutura do workflow: agenda, permissões mínimas, segredo nunca impresso, só commita o público) e 2 testes do cache. O workflow em si **só pode ser executado pelo GitHub**.
+
+### Alterado
+- **Regra "sem GitHub Actions" revogada pelo usuário para este workflow** (CLAUDE.md 1.4 atualizado); continua proibido compilar o APK ou guardar APK no repositório.
 
 ## [1.21.3] - 2026-10-29
 
