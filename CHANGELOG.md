@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.21.3.
+
+## [1.21.3] - 2026-10-29
+
+### Alterado
+- **README: receita completa e em ordem do Firebase** (pedido do usuário, 29/10/2026: incluir todos os comandos para reproduzir): clonar, console do Firebase, onde colocar os dois JSON, testes e APK, ambiente Python 3.12, atualização do retrato, `git pull/add/commit/push` e publicação de versão. Também explica por que `git add` falha na pasta extraída do `.zip` (sem `.git`) e que o site do Pages não atualiza sozinho.
+
 Nenhuma mudança desde a 1.21.2.
 
 ## [1.21.2] - 2026-10-29

@@ -547,6 +547,10 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 ### 4.52 Python >= 3.10 para o script do Firestore — versão 1.21.2
 - Saída real do usuário (29/10/2026): `pip install -r server/requirements.txt` → "No matching distribution found for fastapi==0.146.0"; o log lista que FastAPI 0.129+ exige Python >= 3.10. Versão do Python dele **não informada** (provável 3.9 do macOS, não confirmado). Correção: README (venv com python3.12) e aviso no início de `tool/publicar_dados_firestore.py`. Não testei em Mac nem em Python 3.9.
 
+### 4.53 README com a receita completa do Firebase — versão 1.21.3
+- Pedido do usuário (29/10/2026): todos os comandos citados no README, para reprodutibilidade. Seção "Respostas no Firebase" reescrita em A a F (clone, console, arquivos JSON, APK, retrato, publicação). Causa de o usuário ter rodado `git add` numa pasta sem Git: o zip entregue não leva `.git` (explicado no README).
+- Pergunta do usuário: botão no Pages para atualizar os dados do Firebase. Resposta dada: não direto (Pages é estático; a chave de serviço não pode ir à página; regra 1.4 proíbe GitHub Actions). Alternativas apresentadas: agregados publicados em um documento do Firestore lido pelo site (exige tarefa agendada fora do Pages, possivelmente plano pago do Firebase: NÃO verificado) ou rodar o script de tempos em tempos no Mac. Decisão do usuário pendente.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

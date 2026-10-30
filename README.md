@@ -225,25 +225,79 @@ git add docs && git commit -m "Atualiza o site" && git push origin main
 
 ## Respostas no Firebase (Firestore)
 
-Desde a 1.21.0 o app grava as respostas compartilhadas no **Firestore** (projeto `respirar-as`), não mais no servidor FastAPI. Passo a passo (Android):
+Desde a 1.21.0 o app grava as respostas compartilhadas no **Firestore** (projeto `respirar-as`), não mais no servidor FastAPI. Receita completa, do zero, em ordem (testada só em parte; ver "Limites" no fim). Comandos para macOS; no Linux troque `brew install` pelo gerenciador da distribuição.
 
-1. **Console do Firebase:** Build > Firestore Database > criar o banco (escolha a região; ela define onde os dados ficam). Em *Regras*, cole `firebase/firestore.rules` e publique.
-2. **Arquivo do app:** salve o `google-services.json` baixado do console em `firebase/google-services.json` (fica fora do Git). `bash tool/gerar_apk.sh` o copia para `android/app/` e liga o plugin do Gradle. Sem o arquivo, o APK sai em modo local (não envia).
-3. **Chave para o site:** Configurações do projeto > Contas de serviço > *Gerar nova chave privada*; salve como `firebase/chave-servico.json` (ignorado pelo Git; quem tem essa chave lê TODO o banco).
-4. **Retrato do site:** exige **Python 3.10 ou mais novo** (`fastapi==0.146.0`, de `server/requirements.txt`, não instala em 3.9; no macOS o `python3` do sistema costuma ser o 3.9). Prepare um ambiente (uma vez; no Mac: `brew install python@3.12`):
-   ```bash
-   python3.12 -m venv .venv && source .venv/bin/activate
-   pip install google-cloud-firestore httpx -r server/requirements.txt
-   ```
-   Depois, com o ambiente ativo (`source .venv/bin/activate`):
-   ```bash
-   python3 tool/gerar_pages.py                     # se mudou o site
-   python3 tool/publicar_dados_firestore.py        # lê o Firestore e grava docs/dados/
-   git add docs && git commit -m "Atualiza o retrato dos dados" && git push origin main
-   ```
-5. Recomendado no console: restringir a chave de API do Android ao pacote `br.ufam.fcf.respirar_amazonas` (Google Cloud > Credenciais) e ativar o App Check. A chave do `google-services.json` não é segredo (vai em todo APK); a proteção é feita pelas regras.
+### A. Pegar o código (uma vez)
 
-Limites: iOS ainda sem Firebase (falta o `GoogleService-Info.plist`); as estatísticas dentro do app e o painel do servidor continuam lendo o servidor FastAPI, que não recebe mais respostas novas.
+```bash
+git clone https://github.com/micael-oliveira-ufam/respirar-amazonas.git
+cd respirar-amazonas
+```
+Caminho sem acentos nem espaços. Para atualizar depois: `git pull origin main`. (O `.zip` entregue pelo agente **não tem** `.git`: `git add/commit/push` só funcionam num clone.)
+
+### B. Console do Firebase (uma vez, no navegador)
+
+1. Projeto `respirar-as` > Build > **Firestore Database** > *Criar banco de dados* > edição Standard, ID `(default)`, **região** (não muda depois; confirme com a instituição) e **modo de produção**.
+2. Aba **Regras**: apague tudo, cole o conteúdo de `firebase/firestore.rules` e **Publicar**.
+3. Configurações do projeto > seu app Android (pacote `br.ufam.fcf.respirar_amazonas`) > baixe `google-services.json`.
+4. Configurações do projeto > **Contas de serviço** > *Gerar nova chave privada* > baixe o JSON.
+5. Recomendado: restringir a chave de API ao pacote Android (Google Cloud > APIs e serviços > Credenciais) e ativar o App Check. A chave do `google-services.json` não é segredo; a proteção é feita pelas regras.
+
+### C. Colocar os dois arquivos (fora do Git)
+
+```bash
+cp ~/Downloads/google-services.json firebase/google-services.json
+cp ~/Downloads/<nome-longo>-firebase-adminsdk-<...>.json firebase/chave-servico.json
+git status --short        # NÃO pode listar nenhum dos dois (estão no .gitignore)
+```
+A chave de serviço lê TODO o banco: não envie a ninguém; se vazar, revogue no console.
+
+### D. Gerar o APK e testar o envio
+
+```bash
+flutter pub get
+flutter analyze
+flutter test
+bash tool/gerar_apk.sh
+```
+No log do `gerar_apk.sh` deve aparecer `[android/app/google-services.json] copiado`. Se aparecer `firebase/google-services.json ausente ... MODO LOCAL`, o APK **não envia**. Instale `dist/RespirAR-Amazonas-vX.Y.Z.apk`, aceite o termo, responda o questionário e toque em *Sim*. No console: Firestore Database > Dados > coleção `respostas` > um documento por envio.
+
+### E. Gerar o retrato do site (sempre que quiser atualizar)
+
+Exige **Python 3.10 ou mais novo** (`fastapi==0.146.0` não instala em 3.9; o `python3` do macOS costuma ser o 3.9). Ambiente virtual, uma vez:
+```bash
+brew install python@3.12
+python3.12 -m venv .venv
+source .venv/bin/activate                 # em cada terminal novo
+pip install google-cloud-firestore httpx -r server/requirements.txt
+```
+Atualização (com o ambiente ativo, na raiz do clone):
+```bash
+git pull origin main
+python3 tool/publicar_dados_firestore.py        # lê o Firestore e grava docs/dados/ (precisa de internet: Firestore, Open-Meteo, Nominatim)
+git add docs
+git commit -m "Atualiza o retrato dos dados"
+git push origin main
+```
+Se mudou algo em `server/app/static_publico/` ou na versão, rode antes `python3 tool/gerar_pages.py`. Opções do script: `--sem-bairros` (não consulta o Nominatim), `--chave CAMINHO`, `--saida PASTA`. O site publicado atualiza em cerca de 1 a 2 minutos após o `push`.
+
+### F. Publicar versão nova (quem mantém o projeto)
+
+```bash
+python3 tool/versao.py nova patch               # ou minor | major
+python3 tool/versao.py verificar
+(cd server && python3 -m pytest -q) && python3 -m pytest tool -q
+git add -A && git commit -m "Release X.Y.Z"
+git tag -a vX.Y.Z -m "Versão X.Y.Z"
+git push origin main vX.Y.Z
+```
+
+### Limites
+
+- **iOS** ainda sem Firebase (falta o `GoogleService-Info.plist`): no iOS o app fica em modo local.
+- As **estatísticas dentro do app** e o **painel do servidor** continuam lendo o servidor FastAPI, que não recebe mais respostas novas.
+- O site do Pages **não atualiza sozinho**: é um retrato gerado pelo passo E (Pages só serve arquivos; a chave de serviço nunca pode ficar numa página pública).
+- Testado aqui: o script do passo E (documentos fictícios), a coerência das regras com o app e o patch do Gradle. **Não testado:** Dart, regras em execução, build Gradle com o plugin, leitura do Firestore real.
 
 ## Versionamento
 
