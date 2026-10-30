@@ -1,5 +1,9 @@
 # RespirAR Amazonas
 
+## 🌐 Site público: **<https://micael-oliveira-ufam.github.io/respirar-amazonas/>**
+
+Painel com sintomas mais relatados, qualidade do ar, mapas e bairros de Manaus mais afetados, e o download do app. Os dados são atualizados automaticamente a cada 6 horas a partir do Firestore.
+
 App Flutter (Android e iOS) para **orientação e triagem educativa** durante episódios de fumaça no Amazonas, com focos de calor por satélite (INPE), qualidade do ar estimada e estatísticas anonimizadas dos sintomas. Acompanha um servidor (FastAPI + PostgreSQL) que sobe com um comando via Docker.
 
 Projeto da UFAM / FCF. Desenvolvedores: Micael Davi Lima de Oliveira e Elias de Souza Barros.
