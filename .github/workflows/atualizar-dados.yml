@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -60,7 +60,9 @@ jobs:
             exit 0
           fi
           git commit -m "Atualiza o retrato dos dados (automático)"
-          git push origin HEAD:main || { git pull --rebase origin main && git push origin HEAD:main; }
+          # Se o main andou desde o checkout (ex.: nova execução de um run antigo), refaz o commit por cima do
+          # main novo. `-X theirs` = no conflito de arquivo gerado vence o retrato que ESTE run acabou de gerar.
+          git push origin HEAD:main || { git pull --rebase -X theirs origin main && git push origin HEAD:main; }
 
       - name: Pedir a publicação do Pages
         # Um push feito com o GITHUB_TOKEN pode não disparar a publicação sozinho; este pedido garante.

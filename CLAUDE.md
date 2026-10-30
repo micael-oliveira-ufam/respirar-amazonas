@@ -557,6 +557,10 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - **NÃO verificado:** a execução real do workflow (só o GitHub executa), as versões `actions/checkout@v4` e `actions/setup-python@v5` (escolhidas de memória; não consegui consultar), o nome exato do papel de leitura do Firestore (`roles/datastore.viewer`), o acesso do runner ao Firestore/Open-Meteo/Nominatim, a desativação do agendamento após 60 dias sem atividade, custo (esperado gratuito em repositório público; conferir nos termos).
 - Push de arquivo em `.github/workflows/` exige que o token do GitHub tenha o escopo `workflow`; se o push do sandbox for recusado, o usuário envia pelo Mac.
 
+### 4.55 Correções do workflow — versão 1.22.1
+- Primeira execução real (29/10/2026): o workflow publicou o commit `96c1949` e o site passou a servir `docs/dados` (1 resposta, nível emergência, bairro São José Operário no cache). Um *re-run* do mesmo run falhou: re-run usa o commit original, e `git pull --rebase` dava conflito `add/add` nos CSV gerados → `-X theirs`. Aviso de Node 20: actions trocadas para `checkout@v7` e `setup-python@v7` (Latest nas páginas de releases; Node de cada uma NÃO verificado). Não fazer *re-run* de execuções antigas: use *Run workflow* de novo.
+- O repositório está em *Read* nas permissões padrão de workflow e isso bastou (o YAML declara `contents: write` e `pages: write`). O README dizia para mudar; corrigido.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

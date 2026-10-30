@@ -12,6 +12,14 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.22.1.
+
+## [1.22.1] - 2026-10-29
+
+### Corrigido
+- **Workflow falhava ao rodar de novo uma execução antiga (*Re-run*)** (visto em 29/10/2026, execução #1, passo "Publicar"): o *re-run* usa o commit ORIGINAL do run (0b2feb0), então o `git pull --rebase` encontrava os arquivos gerados pelo run anterior e dava conflito `add/add` em `docs/dados/csv/*.csv`. Agora usa `git pull --rebase -X theirs`: no conflito vence o retrato recém-gerado. O problema foi reproduzido e a correção testada num repositório de teste local. Execuções agendadas (sempre sobre o `main` atual) não eram afetadas.
+- **Aviso "Node.js 20 is deprecated"**: `actions/checkout` v4 → **v7** e `actions/setup-python` v5 → **v7**, as versões "Latest" nas páginas de releases dos dois repositórios (lidas em 29/10/2026). A versão do Node que cada uma usa NÃO foi lida; o aviso deve sumir (conferir na próxima execução). As mudanças "BREAKING" listadas no checkout são sobre `pull_request_target`, que este workflow não usa.
+
 Nenhuma mudança desde a 1.22.0.
 
 ## [1.22.0] - 2026-10-29

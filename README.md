@@ -299,9 +299,9 @@ O workflow `.github/workflows/atualizar-dados.yml` repete o passo E **a cada 6 h
 Configuração (uma vez):
 1. **Conta de serviço só de leitura** (recomendado em vez da chave de administrador): Google Cloud > IAM e administrador > Contas de serviço > *Criar conta de serviço* (projeto `respirar-as`) > conceda o papel de leitura do Firestore (o papel "Leitor do Cloud Datastore", `roles/datastore.viewer`; confirme o nome no console) > aba *Chaves* > *Adicionar chave* > JSON.
 2. **Segredo no GitHub:** repositório > Settings > Secrets and variables > Actions > *New repository secret* > nome `FIREBASE_SERVICE_ACCOUNT` > valor = **todo o conteúdo** do JSON baixado. Depois apague o arquivo baixado ou guarde-o fora do repositório.
-3. **Permissão de escrita do workflow:** Settings > Actions > General > *Workflow permissions* > *Read and write permissions* (o próprio arquivo já pede `contents: write`, mas essa opção do repositório pode bloquear).
+3. **Permissão de escrita:** não é preciso mudar nada. O workflow declara `contents: write` e `pages: write` e isso basta, mesmo com *Workflow permissions* em "Read repository contents" (testado em 29/10/2026). Só se o passo "Publicar" falhar com 403, marque *Read and write permissions* em Settings > Actions > General.
 4. **Publicar o workflow:** `git pull origin main` (o arquivo vem no clone) e confira que `.github/workflows/atualizar-dados.yml` existe no GitHub.
-5. **Teste manual:** aba *Actions* > *Atualizar dados do site* > *Run workflow*. O passo "Gerar o retrato" deve imprimir `Lidos N documentos` e o "Publicar" deve criar o commit `Atualiza o retrato dos dados (automático)`.
+5. **Teste manual:** use *Run workflow* (não *Re-run all jobs* de uma execução antiga, que usa o commit antigo). aba *Actions* > *Atualizar dados do site* > *Run workflow*. O passo "Gerar o retrato" deve imprimir `Lidos N documentos` e o "Publicar" deve criar o commit `Atualiza o retrato dos dados (automático)`.
 
 Cuidados:
 - Quem tiver permissão de escrita no repositório pode alterar o workflow e ler o segredo. Mantenha poucos colaboradores e a conta de serviço só de leitura.

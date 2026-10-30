@@ -35,6 +35,14 @@ class Workflow(unittest.TestCase):
         self.assertIn("git diff --cached --quiet", TEXTO)
         self.assertNotIn("chave-servico.json docs", TEXTO)
 
+    def test_actions_em_versoes_com_node_atual(self):
+        self.assertIn("actions/checkout@v7", TEXTO)
+        self.assertIn("actions/setup-python@v7", TEXTO)
+        self.assertNotRegex(TEXTO, r"actions/(checkout|setup-python)@v[1-5]\b")
+
+    def test_conflito_de_push_resolve_a_favor_do_retrato_novo(self):
+        self.assertIn("git pull --rebase -X theirs origin main", TEXTO)
+
     def test_nao_compila_apk_nem_sobe_apk(self):
         self.assertNotRegex(TEXTO.lower(), r"flutter|gerar_apk|\.apk|upload-artifact")
 
