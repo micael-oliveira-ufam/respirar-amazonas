@@ -8,6 +8,16 @@ import '../models/fire_hotspot.dart';
 import '../models/fire_satellite.dart';
 import 'api_config.dart';
 
+/// Texto do CSV do INPE. Tenta UTF-8; se os bytes não forem UTF-8 válido, lê como Latin-1 (ISO-8859-1),
+/// para "LÁBREA" não virar "L\uFFFDBREA". Qual codificação o INPE usa NÃO foi verificada; aceita as duas.
+String decodeCsvBytes(List<int> bytes) {
+  try {
+    return utf8.decode(bytes);
+  } on FormatException {
+    return latin1.decode(bytes);
+  }
+}
+
 /// Erro ao obter ou interpretar os dados do INPE.
 ///
 /// [kind] separa a causa, para a tela mostrar uma mensagem clara.
@@ -289,7 +299,7 @@ class InpeFireService {
         );
         continue;
       }
-      return utf8.decode(response.bodyBytes, allowMalformed: true);
+      return decodeCsvBytes(response.bodyBytes);
     }
     throw last ??
         const InpeException('Não foi possível obter os focos de calor agora.', kind: InpeErrorKind.network);

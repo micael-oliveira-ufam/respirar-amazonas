@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.22.2.
+
+## [1.22.2] - 2026-10-29
+
+### Corrigido
+- **Acento errado nos focos baixados pelo celular** (`flutter test` real do usuário em 29/10/2026, versão 1.22.0: 171 aprovados, 1 falho em `inpe_csv_test.dart`, "Expected: 'LÁBREA' / Actual: 'L�BREA'"). O app lia o CSV do INPE sempre como UTF-8 e trocava bytes inválidos por "�". Agora `decodeCsvBytes` tenta UTF-8 e, se não for UTF-8 válido, lê como Latin-1. **Qual codificação o INPE usa de verdade continua NÃO verificada**; o app passa a aceitar as duas. O teste que falhava montava a resposta com `http.Response(texto)` (Latin-1 por padrão), o que agora também funciona; 2 testes novos do decodificador (não executados aqui: sem Flutter).
+
 Nenhuma mudança desde a 1.22.1.
 
 ## [1.22.1] - 2026-10-29

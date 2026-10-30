@@ -561,6 +561,10 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - Primeira execução real (29/10/2026): o workflow publicou o commit `96c1949` e o site passou a servir `docs/dados` (1 resposta, nível emergência, bairro São José Operário no cache). Um *re-run* do mesmo run falhou: re-run usa o commit original, e `git pull --rebase` dava conflito `add/add` nos CSV gerados → `-X theirs`. Aviso de Node 20: actions trocadas para `checkout@v7` e `setup-python@v7` (Latest nas páginas de releases; Node de cada uma NÃO verificado). Não fazer *re-run* de execuções antigas: use *Run workflow* de novo.
 - O repositório está em *Read* nas permissões padrão de workflow e isso bastou (o YAML declara `contents: write` e `pages: write`). O README dizia para mudar; corrigido.
 
+### 4.56 Primeiro `flutter test` completo com o Firebase — versão 1.22.2
+- Log real do usuário (`dist/flutter-test.log`, APK 1.22.0 gerado em 29/10/2026 21:41): 171 aprovados, **1 falho** (`inpe_csv_test`, acento de "LÁBREA" no download de focos pelo celular). O `gerar_apk.sh` não bloqueia por teste (regra da 1.16.0), então o APK saiu mesmo assim. Correção: `decodeCsvBytes` (UTF-8, senão Latin-1). **Não** foi enviada a saída do `flutter analyze`. Os testes novos do Firebase (`answer_sink_test`, `answer_sync_test`, `platform_card_test`) não aparecem como falhos no log; o log só lista os testes na linha de progresso, então não confirmo um a um.
+- Tags: as tags `vX.Y.Z` criadas no sandbox NÃO existem no clone do usuário, então `git push origin vX.Y.Z` do Mac não funciona. Para criar a tag, use a página de *Release* do GitHub (cria a tag no commit escolhido).
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:respirar_amazonas/models/fire_satellite.dart';
@@ -149,5 +150,15 @@ void main() {
       expect(result.hotspots, isEmpty);
       expect(hosts, contains('api.exemplo.com.br'));
     }, timeout: const Timeout(Duration(seconds: 30)));
+  });
+
+  group('decodeCsvBytes', () {
+    test('UTF-8 válido é lido como UTF-8', () {
+      expect(decodeCsvBytes(utf8.encode('LÁBREA;PARÁ')), 'LÁBREA;PARÁ');
+    });
+
+    test('bytes Latin-1 (não UTF-8) também mantêm o acento', () {
+      expect(decodeCsvBytes(latin1.encode('LÁBREA;PARÁ')), 'LÁBREA;PARÁ');
+    });
   });
 }
