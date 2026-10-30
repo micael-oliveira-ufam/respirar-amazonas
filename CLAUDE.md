@@ -544,6 +544,9 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 ### 4.51 Site público na tela Sobre do app — versão 1.21.1
 - Pedido do usuário (29/10/2026): em "informações" do app deve constar `https://micael-oliveira-ufam.github.io/respirar-amazonas/`. Feito no cartão "Plataforma online" (`lib/widgets/platform_card.dart`, constante `kSitePublicoUrl`); abre no navegador. O app não depende mais de `ApiConfig.baseUrl` para esse cartão. Texto sem "focos de calor". **Dart não compilado; teste de widget não executado.** Se o endereço do Pages mudar, trocar a constante e `URL_PADRAO` em `tool/gerar_pages.py` (um teste Python confere os dois).
 
+### 4.52 Python >= 3.10 para o script do Firestore — versão 1.21.2
+- Saída real do usuário (29/10/2026): `pip install -r server/requirements.txt` → "No matching distribution found for fastapi==0.146.0"; o log lista que FastAPI 0.129+ exige Python >= 3.10. Versão do Python dele **não informada** (provável 3.9 do macOS, não confirmado). Correção: README (venv com python3.12) e aviso no início de `tool/publicar_dados_firestore.py`. Não testei em Mac nem em Python 3.9.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

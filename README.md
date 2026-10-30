@@ -230,7 +230,12 @@ Desde a 1.21.0 o app grava as respostas compartilhadas no **Firestore** (projeto
 1. **Console do Firebase:** Build > Firestore Database > criar o banco (escolha a região; ela define onde os dados ficam). Em *Regras*, cole `firebase/firestore.rules` e publique.
 2. **Arquivo do app:** salve o `google-services.json` baixado do console em `firebase/google-services.json` (fica fora do Git). `bash tool/gerar_apk.sh` o copia para `android/app/` e liga o plugin do Gradle. Sem o arquivo, o APK sai em modo local (não envia).
 3. **Chave para o site:** Configurações do projeto > Contas de serviço > *Gerar nova chave privada*; salve como `firebase/chave-servico.json` (ignorado pelo Git; quem tem essa chave lê TODO o banco).
-4. **Retrato do site:** `pip install google-cloud-firestore httpx -r server/requirements.txt` (uma vez) e depois
+4. **Retrato do site:** exige **Python 3.10 ou mais novo** (`fastapi==0.146.0`, de `server/requirements.txt`, não instala em 3.9; no macOS o `python3` do sistema costuma ser o 3.9). Prepare um ambiente (uma vez; no Mac: `brew install python@3.12`):
+   ```bash
+   python3.12 -m venv .venv && source .venv/bin/activate
+   pip install google-cloud-firestore httpx -r server/requirements.txt
+   ```
+   Depois, com o ambiente ativo (`source .venv/bin/activate`):
    ```bash
    python3 tool/gerar_pages.py                     # se mudou o site
    python3 tool/publicar_dados_firestore.py        # lê o Firestore e grava docs/dados/

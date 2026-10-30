@@ -12,6 +12,13 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+Nenhuma mudança desde a 1.21.2.
+
+## [1.21.2] - 2026-10-29
+
+### Corrigido
+- **`pip install -r server/requirements.txt` falhava com "No matching distribution found for fastapi==0.146.0"** (saída real do usuário, 29/10/2026): o log mostra que todas as versões do FastAPI a partir da 0.129 exigem Python >= 3.10, e o `python3` usado era mais antigo (a versão exata dele não consta no log; provável 3.9 do macOS, NÃO confirmado). README ensina a criar um ambiente virtual com `python3.12`, e `tool/publicar_dados_firestore.py` agora avisa com mensagem clara se o Python for < 3.10.
+
 Nenhuma mudança desde a 1.21.1.
 
 ## [1.21.1] - 2026-10-29

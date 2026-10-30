@@ -31,6 +31,10 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+if sys.version_info < (3, 10):  # fastapi==0.146.0 (server/requirements.txt) exige Python >= 3.10
+    sys.exit("Este script precisa de Python 3.10 ou mais novo (o seu é %d.%d). Veja README, seção "
+             "'Respostas no Firebase': crie um ambiente virtual com python3.12." % sys.version_info[:2])
+
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "server"))
 
