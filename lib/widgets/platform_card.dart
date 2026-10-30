@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../services/api_config.dart';
 import '../theme/app_theme.dart';
 import 'ui.dart';
 
-/// Link da plataforma online (painel público com os dados agregados), que o usuário abre
-/// no navegador. Não há como alterar o endereço pelo app: ele é definido na compilação.
+/// Endereço do site público do projeto (GitHub Pages). Deve apontar para o mesmo site que `URL_PADRAO` de tool/gerar_pages.py (teste confere).
+const kSitePublicoUrl = 'https://micael-oliveira-ufam.github.io/respirar-amazonas/';
+
+/// Link da plataforma online (site público com os dados agregados), que o usuário abre no navegador.
 class PlatformCard extends StatelessWidget {
   const PlatformCard({super.key});
 
@@ -21,10 +22,9 @@ class PlatformCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = ApiConfig.baseUrl;
-    final configured = url.isNotEmpty;
+    const url = kSitePublicoUrl;
     return AppCard(
-      onTap: configured ? () => _open(context, url) : null,
+      onTap: () => _open(context, url),
       child: Row(
         children: [
           const Icon(Icons.public_rounded, color: AppColors.brandDark, size: 30),
@@ -37,16 +37,16 @@ class PlatformCard extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.ink)),
                 const SizedBox(height: 4),
                 const Text(
-                  'Focos de calor, sintomas mais relatados, mapas e bairros de Manaus mais '
+                  'Sintomas mais relatados, qualidade do ar, mapas e bairros de Manaus mais '
                   'afetados, em dados agregados e abertos a qualquer pessoa.',
                   style: TextStyle(height: 1.4, color: AppColors.muted),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  configured ? url : 'Endereço ainda não disponível nesta versão do aplicativo.',
+                const Text(
+                  url,
                   style: TextStyle(
-                    color: configured ? const Color(0xFF1565C0) : AppColors.muted,
-                    decoration: configured ? TextDecoration.underline : null,
+                    color: Color(0xFF1565C0),
+                    decoration: TextDecoration.underline,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

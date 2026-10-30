@@ -12,7 +12,12 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
-Nenhuma mudança desde a 1.21.0.
+Nenhuma mudança desde a 1.21.1.
+
+## [1.21.1] - 2026-10-29
+
+### Alterado
+- **Tela "Sobre o aplicativo" mostra o site público** (pedido do usuário, 29/10/2026): o cartão "Plataforma online" passa a exibir e abrir `https://micael-oliveira-ufam.github.io/respirar-amazonas/` (GitHub Pages), em vez do endereço do servidor definido na compilação. Antes, sem servidor, o cartão dizia "Endereço ainda não disponível". O texto do cartão deixou de citar "focos de calor", que não aparecem mais na página pública desde a 1.13.0. Teste de widget `test/platform_card_test.dart` (não executado: sem Flutter aqui) e teste Python que confere que o endereço do app é o mesmo de `URL_PADRAO` em `tool/gerar_pages.py`.
 
 ## [1.21.0] - 2026-10-27
 

@@ -541,6 +541,9 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - **Verificado:** 9 testes do script (documentos fictícios, geocoder e ar simulados), 6 de coerência das regras com app/servidor, 7 do patch Gradle. **NÃO verificado:** o Dart (nem `flutter pub get`), as regras do Firestore em execução (sem emulador aqui; a sintaxe foi escrita pela documentação, não executada), build Gradle com o plugin google-services, `google-cloud-firestore` real contra o projeto, gravação do APK no Firestore, a qualidade do ar a partir da máquina do usuário.
 - Pendências ligadas: iOS (`GoogleService-Info.plist` + `Podfile`), estatísticas no app e painel do servidor ainda leem o FastAPI, restringir a chave de API, App Check, região do Firestore e retenção definidas pela instituição.
 
+### 4.51 Site público na tela Sobre do app — versão 1.21.1
+- Pedido do usuário (29/10/2026): em "informações" do app deve constar `https://micael-oliveira-ufam.github.io/respirar-amazonas/`. Feito no cartão "Plataforma online" (`lib/widgets/platform_card.dart`, constante `kSitePublicoUrl`); abre no navegador. O app não depende mais de `ApiConfig.baseUrl` para esse cartão. Texto sem "focos de calor". **Dart não compilado; teste de widget não executado.** Se o endereço do Pages mudar, trocar a constante e `URL_PADRAO` em `tool/gerar_pages.py` (um teste Python confere os dois).
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

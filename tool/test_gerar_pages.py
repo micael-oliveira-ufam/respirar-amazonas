@@ -122,3 +122,12 @@ def test_apk_url_personalizada_vai_para_o_config_e_o_qr(tmp_path):
     outro = tmp_path / "o"
     gp.gerar(outro, None, "https://u.github.io/r")
     assert (saida / "assets" / "qr-app.svg").read_bytes() != (outro / "assets" / "qr-app.svg").read_bytes()  # QR muda com o endereço
+
+
+def test_endereco_do_site_no_app_e_o_mesmo_do_gerador():
+    """O cartão 'Plataforma online' do app (Sobre) deve abrir o mesmo site que o gerador publica."""
+    import re
+
+    dart = (RAIZ / "lib/widgets/platform_card.dart").read_text(encoding="utf-8")
+    no_app = re.search(r"kSitePublicoUrl = '([^']+)'", dart).group(1)
+    assert no_app.rstrip("/") == gp.URL_PADRAO.rstrip("/")
