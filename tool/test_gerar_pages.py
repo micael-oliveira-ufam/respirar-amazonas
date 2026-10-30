@@ -55,7 +55,7 @@ def test_modo_estatico_nao_depende_do_servidor(tmp_path):
     cfg = (saida / "assets" / "config.js").read_text(encoding="utf-8")
     assert "window.RESPIRAR_MODO = 'estatico';" in cfg and "window.RESPIRAR_API = '';" in cfg
     assert f"window.RESPIRAR_APK_URL = '{gp.APK_URL_PADRAO}';" in cfg
-    assert gp.APK_URL_PADRAO == "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v1.22.2/RespirAR-Amazonas-v1.22.2.apk"
+    assert gp.APK_URL_PADRAO == "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v1.22.2/RespirAR-Amazonas-v1.22.0.apk"
     assert "respirar-amazonas.cloud" not in html + cfg                 # nenhum endereço do servidor
     assert 'href="dados/painel-30.json"' in html and 'src="assets/ar_modelo.js' in html
     meta = re.search(r'http-equiv="Content-Security-Policy" content="([^"]+)"', html).group(1)

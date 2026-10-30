@@ -14,7 +14,7 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ### Alterado
 - **README:** o endereço do site público passou para o topo do arquivo, logo abaixo do título.
-- **Botão de download do site aponta para a Release `v1.22.2`** (`APK_URL_PADRAO` em `tool/gerar_pages.py`; antes `v.1.20.0`). O link só funciona depois que a Release `v1.22.2` for publicada no GitHub com o arquivo `RespirAR-Amazonas-v1.22.2.apk` anexado; até lá o download dá 404. Sem mudança de versão do app.
+- **Botão de download do site aponta para o arquivo `RespirAR-Amazonas-v1.22.0.apk` dentro da Release `v1.22.2`**, por decisão do usuário em 29/10/2026: esse é o único APK anexado hoje, e é o de ANTES da correção de acentos do INPE (1.22.2). Quando o APK 1.22.2 for anexado, trocar `APK_URL_PADRAO` de volta para `.../v1.22.2/RespirAR-Amazonas-v1.22.2.apk`. (Texto anterior desta entrada:) (`APK_URL_PADRAO` em `tool/gerar_pages.py`; antes `v.1.20.0`). O link só funciona depois que a Release `v1.22.2` for publicada no GitHub com o arquivo `RespirAR-Amazonas-v1.22.2.apk` anexado; até lá o download dá 404. Sem mudança de versão do app.
 
 Nenhuma mudança desde a 1.22.2.
 
