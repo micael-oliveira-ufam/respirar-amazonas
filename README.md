@@ -219,7 +219,7 @@ git add docs && git commit -m "Atualiza o site" && git push origin main
 ```
 
 1. Publicar (uma vez): Settings > Pages > Source: *Deploy from a branch* > `main` > `/docs`. Endereço esperado: `https://micael-oliveira-ufam.github.io/respirar-amazonas/`.
-2. APK: envie o arquivo gerado por `tool/gerar_apk.sh` como *Release* (o Git não guarda o APK). O site aponta para um endereço fixo (`APK_URL_PADRAO` em `tool/gerar_pages.py`, hoje `.../releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk`). A cada APK novo: `python3 tool/gerar_pages.py --apk-url <novo endereço>` (ou edite o padrão) e faça commit de `docs/`.
+2. APK: envie o arquivo gerado por `tool/gerar_apk.sh` como *Release* (o Git não guarda o APK). O site aponta para um endereço fixo (`APK_URL_PADRAO` em `tool/gerar_pages.py`, hoje `.../releases/download/v1.22.2/RespirAR-Amazonas-v1.22.2.apk`). A cada APK novo: `python3 tool/gerar_pages.py --apk-url <novo endereço>` (ou edite o padrão) e faça commit de `docs/`.
 3. Rode `gerar_pages.py` de novo e faça commit de `docs/` sempre que mudar `server/app/static_publico/` ou a versão. O servidor só é necessário no passo opcional do retrato.
 4. Para o site ler os dados ao vivo do servidor: `python3 tool/gerar_pages.py --api https://respirar-amazonas.cloud`.
 

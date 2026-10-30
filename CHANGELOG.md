@@ -12,6 +12,9 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 
 ## [Não lançado]
 
+### Alterado
+- **Botão de download do site aponta para a Release `v1.22.2`** (`APK_URL_PADRAO` em `tool/gerar_pages.py`; antes `v.1.20.0`). O link só funciona depois que a Release `v1.22.2` for publicada no GitHub com o arquivo `RespirAR-Amazonas-v1.22.2.apk` anexado; até lá o download dá 404. Sem mudança de versão do app.
+
 Nenhuma mudança desde a 1.22.2.
 
 ## [1.22.2] - 2026-10-29

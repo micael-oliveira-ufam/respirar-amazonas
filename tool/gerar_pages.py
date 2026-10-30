@@ -31,7 +31,7 @@ from urllib.parse import urlparse
 RAIZ = Path(__file__).resolve().parent.parent
 FONTE = RAIZ / "server" / "app" / "static_publico"
 VENDOR = RAIZ / "server" / "app" / "static" / "vendor"
-APK_URL_PADRAO = "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v.1.20.0/RespirAR-Amazonas-v1.20.0.apk"
+APK_URL_PADRAO = "https://github.com/micael-oliveira-ufam/respirar-amazonas/releases/download/v1.22.2/RespirAR-Amazonas-v1.22.2.apk"
 MUNICIPIOS_CSV = RAIZ / "server" / "app" / "dados" / "municipios_am.csv"
 MANUAL_PDF = RAIZ / "server" / "app" / "manual" / "Manual_Instalacao_RespirAR_Amazonas.pdf"
 OPEN_METEO = "https://air-quality-api.open-meteo.com"
