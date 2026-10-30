@@ -4,5 +4,11 @@
   "lon": -59.94,
   "bairro": "São José Operário",
   "cidade": "Manaus"
+ },
+ {
+  "lat": -3.05,
+  "lon": -59.97,
+  "bairro": "Novo Aleixo",
+  "cidade": "Manaus"
  }
 ]

@@ -1,5 +1,5 @@
 ﻿periodo_dias,gerado_em_utc,nivel_id,nivel,respostas
-1,2026-10-30T01:51:07.758587+00:00,low,Baixo,1
-1,2026-10-30T01:51:07.758587+00:00,moderate,Moderado,0
-1,2026-10-30T01:51:07.758587+00:00,high,Alto,0
-1,2026-10-30T01:51:07.758587+00:00,emergency,Procure atendimento,1
+1,2026-10-30T12:50:45.217863+00:00,low,Baixo,1
+1,2026-10-30T12:50:45.217863+00:00,moderate,Moderado,1
+1,2026-10-30T12:50:45.217863+00:00,high,Alto,0
+1,2026-10-30T12:50:45.217863+00:00,emergency,Procure atendimento,1
