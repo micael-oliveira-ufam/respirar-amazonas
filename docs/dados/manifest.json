@@ -1,0 +1,137 @@
+{
+ "gerado_em": "2026-10-30T01:22:31+00:00",
+ "fonte": "firestore://respirar-as",
+ "periodos": [
+  1,
+  7,
+  30,
+  90
+ ],
+ "csv": [
+  {
+   "conjunto": "sintomas",
+   "dias": 1,
+   "arquivo": "csv/sintomas-1d.csv"
+  },
+  {
+   "conjunto": "sintomas",
+   "dias": 7,
+   "arquivo": "csv/sintomas-7d.csv"
+  },
+  {
+   "conjunto": "sintomas",
+   "dias": 30,
+   "arquivo": "csv/sintomas-30d.csv"
+  },
+  {
+   "conjunto": "sintomas",
+   "dias": 90,
+   "arquivo": "csv/sintomas-90d.csv"
+  },
+  {
+   "conjunto": "niveis",
+   "dias": 1,
+   "arquivo": "csv/niveis-1d.csv"
+  },
+  {
+   "conjunto": "niveis",
+   "dias": 7,
+   "arquivo": "csv/niveis-7d.csv"
+  },
+  {
+   "conjunto": "niveis",
+   "dias": 30,
+   "arquivo": "csv/niveis-30d.csv"
+  },
+  {
+   "conjunto": "niveis",
+   "dias": 90,
+   "arquivo": "csv/niveis-90d.csv"
+  },
+  {
+   "conjunto": "serie_diaria",
+   "dias": 1,
+   "arquivo": "csv/serie_diaria-1d.csv"
+  },
+  {
+   "conjunto": "serie_diaria",
+   "dias": 7,
+   "arquivo": "csv/serie_diaria-7d.csv"
+  },
+  {
+   "conjunto": "serie_diaria",
+   "dias": 30,
+   "arquivo": "csv/serie_diaria-30d.csv"
+  },
+  {
+   "conjunto": "serie_diaria",
+   "dias": 90,
+   "arquivo": "csv/serie_diaria-90d.csv"
+  },
+  {
+   "conjunto": "bairros",
+   "dias": 1,
+   "arquivo": "csv/bairros-1d.csv"
+  },
+  {
+   "conjunto": "bairros",
+   "dias": 7,
+   "arquivo": "csv/bairros-7d.csv"
+  },
+  {
+   "conjunto": "bairros",
+   "dias": 30,
+   "arquivo": "csv/bairros-30d.csv"
+  },
+  {
+   "conjunto": "bairros",
+   "dias": 90,
+   "arquivo": "csv/bairros-90d.csv"
+  },
+  {
+   "conjunto": "areas",
+   "dias": 1,
+   "arquivo": "csv/areas-1d.csv"
+  },
+  {
+   "conjunto": "areas",
+   "dias": 7,
+   "arquivo": "csv/areas-7d.csv"
+  },
+  {
+   "conjunto": "areas",
+   "dias": 30,
+   "arquivo": "csv/areas-30d.csv"
+  },
+  {
+   "conjunto": "areas",
+   "dias": 90,
+   "arquivo": "csv/areas-90d.csv"
+  },
+  {
+   "conjunto": "perfil_contexto",
+   "dias": 1,
+   "arquivo": "csv/perfil_contexto-1d.csv"
+  },
+  {
+   "conjunto": "perfil_contexto",
+   "dias": 7,
+   "arquivo": "csv/perfil_contexto-7d.csv"
+  },
+  {
+   "conjunto": "perfil_contexto",
+   "dias": 30,
+   "arquivo": "csv/perfil_contexto-30d.csv"
+  },
+  {
+   "conjunto": "perfil_contexto",
+   "dias": 90,
+   "arquivo": "csv/perfil_contexto-90d.csv"
+  },
+  {
+   "conjunto": "qualidade_ar",
+   "dias": null,
+   "arquivo": "csv/qualidade_ar.csv"
+  }
+ ]
+}

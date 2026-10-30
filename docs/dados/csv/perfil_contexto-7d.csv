@@ -1,0 +1,19 @@
+﻿periodo_dias,gerado_em_utc,grupo,categoria,respostas
+7,2026-10-30T01:22:31.326948+00:00,perfil,idoso,0
+7,2026-10-30T01:22:31.326948+00:00,perfil,gestante,0
+7,2026-10-30T01:22:31.326948+00:00,perfil,crianca,0
+7,2026-10-30T01:22:31.326948+00:00,perfil,doenca_respiratoria,0
+7,2026-10-30T01:22:31.326948+00:00,perfil,doenca_cardiaca,1
+7,2026-10-30T01:22:31.326948+00:00,exposicao,under1h,1
+7,2026-10-30T01:22:31.326948+00:00,exposicao,between1and4h,0
+7,2026-10-30T01:22:31.326948+00:00,exposicao,over4h,0
+7,2026-10-30T01:22:31.326948+00:00,contexto:local,(total que respondeu),1
+7,2026-10-30T01:22:31.326948+00:00,contexto:local,casa_janelas_fechadas,1
+7,2026-10-30T01:22:31.326948+00:00,contexto:fumaca_visivel,(total que respondeu),1
+7,2026-10-30T01:22:31.326948+00:00,contexto:fumaca_visivel,nao,1
+7,2026-10-30T01:22:31.326948+00:00,contexto:imunologica,(total que respondeu),1
+7,2026-10-30T01:22:31.326948+00:00,contexto:imunologica,nao,1
+7,2026-10-30T01:22:31.326948+00:00,contexto:medicacao_nao_alivia,(total que respondeu),1
+7,2026-10-30T01:22:31.326948+00:00,contexto:medicacao_nao_alivia,sim,1
+7,2026-10-30T01:22:31.326948+00:00,contexto:piorando,(total que respondeu),1
+7,2026-10-30T01:22:31.326948+00:00,contexto:piorando,sim,1
