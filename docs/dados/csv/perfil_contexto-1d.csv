@@ -1,9 +1,9 @@
 ﻿periodo_dias,gerado_em_utc,grupo,categoria,respostas
-1,2026-11-05T19:55:08.972113+00:00,perfil,idoso,0
-1,2026-11-05T19:55:08.972113+00:00,perfil,gestante,0
-1,2026-11-05T19:55:08.972113+00:00,perfil,crianca,0
-1,2026-11-05T19:55:08.972113+00:00,perfil,doenca_respiratoria,0
-1,2026-11-05T19:55:08.972113+00:00,perfil,doenca_cardiaca,0
-1,2026-11-05T19:55:08.972113+00:00,exposicao,under1h,0
-1,2026-11-05T19:55:08.972113+00:00,exposicao,between1and4h,0
-1,2026-11-05T19:55:08.972113+00:00,exposicao,over4h,0
+1,2026-11-06T06:39:02.143635+00:00,perfil,idoso,0
+1,2026-11-06T06:39:02.143635+00:00,perfil,gestante,0
+1,2026-11-06T06:39:02.143635+00:00,perfil,crianca,0
+1,2026-11-06T06:39:02.143635+00:00,perfil,doenca_respiratoria,0
+1,2026-11-06T06:39:02.143635+00:00,perfil,doenca_cardiaca,0
+1,2026-11-06T06:39:02.143635+00:00,exposicao,under1h,0
+1,2026-11-06T06:39:02.143635+00:00,exposicao,between1and4h,0
+1,2026-11-06T06:39:02.143635+00:00,exposicao,over4h,0
