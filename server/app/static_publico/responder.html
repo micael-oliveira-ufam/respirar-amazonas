@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responder o questionário · RespirAR Amazonas</title>
+  <meta name="description" content="Questionário sobre sintomas durante episódios de fumaça no Amazonas. Opcional, sem nome, telefone ou e-mail.">
+  <meta name="theme-color" content="#1B5E20">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="stylesheet" href="../assets/publico.css">
+  <style>
+    .resp-wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+    .resp-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; margin: 12px 0; }
+    .resp-card h2 { font-size: 1.15rem; margin: 0 0 6px; }
+    .resp-card .ajuda { color: var(--muted); font-size: .92rem; margin: 0 0 12px; }
+    .resp-linha { display: flex; flex-wrap: wrap; gap: 8px; }
+    .resp-linha label { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; min-height: 44px; cursor: pointer; background: var(--soft); }
+    .resp-linha input { width: 18px; height: 18px; accent-color: var(--brand); }
+    .resp-sintoma { border-top: 1px solid var(--line); padding: 12px 0; }
+    .resp-sintoma:first-of-type { border-top: 0; }
+    .resp-sintoma legend { font-weight: 700; margin-bottom: 6px; }
+    .resp-acoes { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .resp-btn { border: 0; border-radius: 999px; padding: 12px 20px; min-height: 48px; font-weight: 700; cursor: pointer; background: var(--brand); color: #fff; font-size: 1rem; }
+    .resp-btn.sec { background: var(--soft); color: var(--brand-d); border: 1px solid var(--line); }
+    .resp-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .resp-aviso { border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--soft); }
+    .resp-aviso.emergencia { background: #FDECEA; color: #7F1D1D; border: 1px solid #F5C2C0; font-weight: 600; }
+    .resp-termo { max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: .92rem; }
+    .resp-termo h3 { font-size: 1rem; margin: 14px 0 4px; }
+    .resp-termo p { margin: 6px 0; }
+    .resp-check { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; }
+    .resp-check input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--brand); flex: none; }
+    .resp-status { min-height: 1.4em; margin-top: 10px; font-weight: 600; }
+    .resp-progresso { color: var(--muted); font-size: .9rem; }
+    @media (max-width: 480px) { .resp-wrap { padding: 12px; } }
+  </style>
+</head>
+<body>
+  <header class="top" style="padding:16px">
+    <div class="resp-wrap" style="padding:0">
+      <a href="../" style="text-decoration:none;color:inherit;font-weight:700">&larr; RespirAR Amazonas</a>
+      <h1 style="font-size:1.5rem;margin:8px 0 0">Responder o questionário</h1>
+      <p style="margin:6px 0 0;color:var(--muted)">Suas respostas são anônimas: não pedimos nome, telefone nem e-mail. Enviar é opcional.</p>
+    </div>
+  </header>
+
+  <main class="resp-wrap">
+    <noscript>
+      <div class="resp-aviso">Este questionário precisa de JavaScript ativado no navegador.</div>
+    </noscript>
+
+    <p class="resp-progresso" id="progresso" aria-live="polite"></p>
+
+    <!-- Etapas: o JavaScript (responder.js) preenche cada uma. A ordem é a do app. -->
+    <form id="formulario" novalidate>
+      <section class="resp-card" id="etapa-0" hidden></section>
+      <section class="resp-card" id="etapa-1" hidden></section>
+      <section class="resp-card" id="etapa-2" hidden></section>
+      <section class="resp-card" id="etapa-3" hidden></section>
+
+      <div class="resp-acoes" id="navegacao">
+        <button type="button" class="resp-btn sec" id="voltar">Voltar</button>
+        <button type="button" class="resp-btn" id="continuar">Continuar</button>
+      </div>
+    </form>
+
+    <section class="resp-card" id="resultado" hidden aria-live="polite"></section>
+
+    <section class="resp-card" id="consentimento" hidden>
+      <h2>Quer enviar estas respostas para o estudo?</h2>
+      <p class="ajuda" id="resumo-termo"></p>
+      <details>
+        <summary>Ler o termo completo (versão <span id="versao-termo"></span>)</summary>
+        <div class="resp-termo" id="texto-termo"></div>
+      </details>
+
+      <label class="resp-check">
+        <input type="checkbox" id="aceite-termo">
+        <span id="rotulo-caixa"></span>
+      </label>
+      <label class="resp-check">
+        <input type="checkbox" id="aceite-localizacao">
+        <span>Incluir minha localização aproximada (cerca de 1 km), se o navegador permitir. É opcional.</span>
+      </label>
+
+      <div class="resp-acoes">
+        <button type="button" class="resp-btn sec" id="nao-enviar">Não enviar</button>
+        <button type="button" class="resp-btn" id="enviar" disabled>Enviar respostas</button>
+      </div>
+      <p class="resp-status" id="status" role="status"></p>
+    </section>
+
+    <section class="resp-card" id="concluido" hidden>
+      <p id="mensagem-final" style="margin:0"></p>
+    </section>
+
+    <p class="resp-progresso" style="margin-top:20px">
+      Orientação educativa, não diagnóstico. Em emergência, ligue <strong>192 (SAMU)</strong>.
+      Mais informações no <a href="../">painel público</a>.
+    </p>
+  </main>
+
+  <script src="../assets/firebase_web.js"></script>
+  <script src="../assets/responder_termo.js"></script>
+  <script src="../assets/responder_logica.js"></script>
+  <script src="../assets/responder.js"></script>
+</body>
+</html>

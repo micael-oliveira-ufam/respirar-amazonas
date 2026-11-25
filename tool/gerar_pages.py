@@ -46,6 +46,14 @@ _CSP = (
 )
 
 
+#: Formulário (responder/): grava no Firestore pelo SDK web; por isso libera só o gstatic (script) e o Google (conexão).
+_CSP_RESPONDER = (
+    "default-src 'self'; script-src 'self' https://www.gstatic.com; "
+    "connect-src 'self' https://*.googleapis.com; style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data:; base-uri 'none'"
+)
+
+
 def origem(url: str) -> str:
     """Valida e normaliza a URL da API (https, sem caminho): vai para o CSP e para o config.js."""
     u = urlparse(url.strip())
@@ -69,8 +77,11 @@ def transformar_html(html: str, api: str | None, url_site: str, versao: str) -> 
     html = html.replace('href="/favicon.ico"', 'href="favicon.ico"')
     if api is None:
         html = html.replace('href="/publico/painel?dias=30"', 'href="dados/painel-30.json"')
+        html = html.replace('href="/responder/"', 'href="responder/"')
+        html = html.replace(' data-so-estatico hidden', '')   # link do formulário só no modo estático
     else:
         html = html.replace('href="/publico/', f'href="{api}/publico/')
+        html = re.sub(r'<p class="responder-link"[^>]*data-so-estatico[^>]*>.*?</p>\s*', '', html, flags=re.S)
     meta = f'<meta http-equiv="Content-Security-Policy" content="{csp(api)}">'
     assert "<head>" in html
     html = html.replace("<head>", "<head>\n  " + meta, 1)
@@ -78,6 +89,19 @@ def transformar_html(html: str, api: str | None, url_site: str, versao: str) -> 
     if restos:
         raise SystemExit(f"Caminhos absolutos que sobraram no HTML (quebrariam no Pages): {restos}")
     return html
+
+
+def gerar_responder(saida: Path) -> None:
+    """Grava docs/responder/index.html com a CSP própria do formulário (sem API; sempre estático)."""
+    html = (FONTE / "responder.html").read_text(encoding="utf-8")
+    meta = f'<meta http-equiv="Content-Security-Policy" content="{_CSP_RESPONDER}">'
+    assert "<head>" in html
+    html = html.replace("<head>", "<head>\n  " + meta, 1)
+    restos = re.findall(r'(?:src|href)="(/[^"/][^"]*)"', html)
+    if restos:
+        raise SystemExit(f"Caminhos absolutos que sobraram em responder.html: {restos}")
+    (saida / "responder").mkdir(parents=True, exist_ok=True)
+    (saida / "responder" / "index.html").write_text(html, encoding="utf-8")
 
 
 def validar_apk_url(url: str) -> str:
@@ -119,7 +143,7 @@ def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PA
         shutil.rmtree(saida)
     (saida / "assets").mkdir(parents=True)
     for arq in sorted(FONTE.iterdir()):
-        if arq.is_file() and arq.name not in ("publico.html", "config.js"):
+        if arq.is_file() and arq.name not in ("publico.html", "config.js", "responder.html"):
             shutil.copy2(arq, saida / "assets" / arq.name)
     shutil.copy2(FONTE / "favicon.ico", saida / "favicon.ico")
     for sub in ("leaflet", "leaflet-heat"):
@@ -137,6 +161,7 @@ def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PA
     (saida / "assets" / "config.js").write_text(cfg, encoding="utf-8")
     html = transformar_html((FONTE / "publico.html").read_text(encoding="utf-8"), api, url_site, versao)
     (saida / "index.html").write_text(html, encoding="utf-8")
+    gerar_responder(saida)
     (saida / "404.html").write_text(
         '<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Página não encontrada</title>'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'

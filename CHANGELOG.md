@@ -16,7 +16,12 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 - **README:** o endereço do site público passou para o topo do arquivo, logo abaixo do título.
 - **Botão de download do site aponta para o arquivo `RespirAR-Amazonas-v1.22.0.apk` dentro da Release `v1.22.2`**, por decisão do usuário em 29/10/2026: esse é o único APK anexado hoje, e é o de ANTES da correção de acentos do INPE (1.22.2). Quando o APK 1.22.2 for anexado, trocar `APK_URL_PADRAO` de volta para `.../v1.22.2/RespirAR-Amazonas-v1.22.2.apk`. (Texto anterior desta entrada:) (`APK_URL_PADRAO` em `tool/gerar_pages.py`; antes `v.1.20.0`). O link só funciona depois que a Release `v1.22.2` for publicada no GitHub com o arquivo `RespirAR-Amazonas-v1.22.2.apk` anexado; até lá o download dá 404. Sem mudança de versão do app.
 
-Nenhuma mudança desde a 1.22.2.
+### Adicionado
+- **Formulário do questionário no site** (`docs/responder/`, link "Responder o questionário" na página pública, só no modo estático). Pedido do usuário (25/11/2026): registrar as respostas pelo site, com o questionário completo, sem depender do app. O site grava direto no Firestore pelo SDK web, com a mesma pontuação do app (`responder_logica.js`), o mesmo termo de consentimento (`responder_termo.js`, gerado de `lib/data/lgpd_terms.dart` por `tool/gerar_termo_site.py`) e o mesmo documento que as regras aceitam (`firebase/firestore.rules`). Localização opcional, arredondada a 2 casas como no app. **Não verificado:** a página em navegador real, o envio ao Firestore e as regras em execução; a configuração web do Firebase (`firebase_web.js`) ainda está vazia, então o formulário mostra "envio indisponível" até ser preenchida.
+- `tool/test_responder_site.py` (11 testes): pontuação igual aos casos de `test/risk_assessment_test.dart`, campos do documento contra `firebase/firestore.rules`, termo e texto de pontuação iguais aos do app, SDK e política de segurança (CSP) do formulário.
+
+### Alterado
+- `tool/gerar_pages.py` gera `responder/index.html` com política de segurança própria (libera só o gstatic para o script e o Google para a conexão); o link do formulário na página pública aparece só no modo estático.
 
 ## [1.22.2] - 2026-10-29
 
