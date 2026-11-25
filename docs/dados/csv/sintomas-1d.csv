@@ -1,1 +1,12 @@
 ﻿periodo_dias,gerado_em_utc,sintoma_id,sintoma,relatos,percentual_das_respostas,leve,moderado,intenso,gravidade_media_0a3
+1,2026-11-25T21:39:11.275308+00:00,nose,Coriza ou nariz irritado,12,80.0,6,5,1,1.58
+1,2026-11-25T21:39:11.275308+00:00,throat,Irritação ou dor na garganta,12,80.0,7,4,1,1.5
+1,2026-11-25T21:39:11.275308+00:00,cough,Tosse,9,60.0,4,5,0,1.56
+1,2026-11-25T21:39:11.275308+00:00,fatigue,Cansaço fora do normal,9,60.0,3,3,3,2.0
+1,2026-11-25T21:39:11.275308+00:00,headache,Dor de cabeça,9,60.0,5,3,1,1.56
+1,2026-11-25T21:39:11.275308+00:00,eyes,"Olhos ardendo, vermelhos ou lacrimejando",8,53.3,6,2,0,1.25
+1,2026-11-25T21:39:11.275308+00:00,dyspnea,Falta de ar,5,33.3,4,0,1,1.4
+1,2026-11-25T21:39:11.275308+00:00,dizzy,Tontura ou confusão,4,26.7,4,0,0,1.0
+1,2026-11-25T21:39:11.275308+00:00,wheeze,Chiado no peito,4,26.7,2,2,0,1.5
+1,2026-11-25T21:39:11.275308+00:00,chest,Aperto ou dor no peito,3,20.0,3,0,0,1.0
+1,2026-11-25T21:39:11.275308+00:00,palpitation,Palpitações ou batimentos irregulares,1,6.7,1,0,0,1.0

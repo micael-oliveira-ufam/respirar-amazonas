@@ -1,5 +1,29 @@
 [
  {
+  "lat": -3.12,
+  "lon": -59.98,
+  "bairro": "Japiim",
+  "cidade": "Manaus"
+ },
+ {
+  "lat": -3.1,
+  "lon": -59.97,
+  "bairro": "Coroado",
+  "cidade": "Manaus"
+ },
+ {
+  "lat": -3.08,
+  "lon": -60.04,
+  "bairro": "Alvorada",
+  "cidade": "Manaus"
+ },
+ {
+  "lat": -3.07,
+  "lon": -60.07,
+  "bairro": "Lírio do Vale",
+  "cidade": "Manaus"
+ },
+ {
   "lat": -3.07,
   "lon": -59.94,
   "bairro": "São José Operário",
@@ -8,6 +32,12 @@
  {
   "lat": -3.05,
   "lon": -59.97,
+  "bairro": "Novo Aleixo",
+  "cidade": "Manaus"
+ },
+ {
+  "lat": -3.04,
+  "lon": -59.96,
   "bairro": "Novo Aleixo",
   "cidade": "Manaus"
  }
