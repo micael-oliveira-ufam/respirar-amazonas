@@ -17,7 +17,7 @@
 // Objeto do console (app Web "Formulário do site", projeto respirar-as). Sem measurementId/Analytics:
 // o formulário não usa Analytics, e coletar dados de navegação exigiria o termo de consentimento.
 window.RESPIRAR_FIREBASE_WEB = {
-  apiKey: "AIzaSyAFHxmYhDWLvPh1YQB_ZiUabGnXGvfSYF4",
+  apiKey: "AIzaSyDOf9W8LjdLfOrwW-Qr6JMhfm3-u4X58Xc",
   authDomain: "respirar-as.firebaseapp.com",
   projectId: "respirar-as",
   storageBucket: "respirar-as.firebasestorage.app",
