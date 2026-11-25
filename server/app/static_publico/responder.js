@@ -84,10 +84,54 @@
     return n;
   }
 
+  var I = window.RespirarIcones;
+
+  /** Ícone SVG (ou null se a biblioteca de ícones não carregou: o formulário funciona sem ícones). */
+  function ico(nome, tam) { return I ? I.icone(nome, tam) : null; }
+
+  /** Selo redondo com o ícone da pergunta. */
+  function selo(nome, grande) {
+    return el('span', { class: 'resp-ico' + (grande ? ' grande' : ''), 'aria-hidden': 'true' }, [ico(nome, grande ? 26 : 24)]);
+  }
+
+  /** Bloco de uma pergunta: selo com ícone + título + ajuda, depois o conteúdo. */
+  function bloco(icone, titulo, ajuda, conteudo, tag) {
+    var cab = el(tag === 'fieldset' ? 'legend' : 'h2', { text: titulo });
+    var textos = el('div', null, [cab, ajuda ? el('p', { class: 'ajuda', text: ajuda }) : null]);
+    var raiz = el(tag || 'div', { class: 'resp-q' + (tag === 'fieldset' ? ' resp-sintoma' : '') }, [
+      el('div', { class: 'resp-q-cab' }, [icone ? selo(icone) : null, textos]),
+      conteudo
+    ]);
+    return raiz;
+  }
+
+  /** Pílula de opção: <label><input/><span class="resp-pilula">[ícone] texto</span></label>. */
+  function opcao(input, texto, icone, classe) {
+    var pilula = el('span', { class: 'resp-pilula' }, [ico(icone, 20), document.createTextNode(texto)]);
+    return el('label', { for: input.id, class: classe || '' }, [input, pilula]);
+  }
+
+  /** Troca o conteúdo de um botão por ícone + texto (o texto continua em textContent). */
+  function rotuloBotao(botao, texto, nomeIcone, depois) {
+    botao.innerHTML = '';
+    var i = ico(nomeIcone, 20);
+    if (i && !depois) botao.appendChild(i);
+    botao.appendChild(document.createTextNode(texto));
+    if (i && depois) botao.appendChild(i);
+  }
+
+  /** Preenche os elementos marcados com data-icone="nome" (ícone antes do texto). */
+  function preencherIcones() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-icone]'), function (n) {
+      var i = ico(n.getAttribute('data-icone'), Number(n.getAttribute('data-tam')) || 18);
+      if (i) n.insertBefore(i, n.firstChild);
+    });
+  }
+
   var contadorGrupo = 0;
 
   /** Grupo de rádios; `valorInicial` pode ser null ("Não sei" é a opção de valor null). */
-  function grupoRadio(rotulo, opcoes, valorAtual, aoMudar, ajuda) {
+  function grupoRadio(rotulo, opcoes, valorAtual, aoMudar, ajuda, icone) {
     var nome = 'g' + (++contadorGrupo);
     var linha = el('div', { class: 'resp-linha', role: 'radiogroup', 'aria-label': rotulo });
     opcoes.forEach(function (o) {
@@ -95,16 +139,12 @@
       var input = el('input', { type: 'radio', name: nome, id: id, value: String(o.v) });
       if (valorAtual === o.v) input.checked = true;
       input.addEventListener('change', function () { aoMudar(o.v); });
-      linha.appendChild(el('label', { for: id }, [input, document.createTextNode(o.r)]));
+      linha.appendChild(opcao(input, o.r));
     });
-    return el('div', null, [
-      el('h2', { text: rotulo }),
-      ajuda ? el('p', { class: 'ajuda', text: ajuda }) : null,
-      linha
-    ]);
+    return bloco(icone, rotulo, ajuda, linha);
   }
 
-  function simNao(rotulo, campo, ajuda) {
+  function simNao(rotulo, campo, ajuda, icone) {
     var atual = estado.contexto[campo];
     var opcoes = [
       { v: 'sim', r: 'Sim' }, { v: 'nao', r: 'Não' }, { v: 'nsei', r: 'Não sei' }
@@ -112,73 +152,99 @@
     var valor = atual === true ? 'sim' : atual === false ? 'nao' : (atual === null ? 'nsei' : undefined);
     return grupoRadio(rotulo, opcoes, valor, function (v) {
       estado.contexto[campo] = v === 'sim' ? true : v === 'nao' ? false : null;
-    }, ajuda);
+    }, ajuda, icone);
   }
 
   function construirSintomas() {
     var secao = $('etapa-0');
     secao.innerHTML = '';
-    secao.appendChild(el('h2', { text: 'O que você sente agora?' }));
-    secao.appendChild(el('p', { class: 'ajuda', text: 'Escolha a intensidade de cada sintoma. Sem marcar, vale "Nenhum".' }));
+    secao.appendChild(el('div', { class: 'resp-intro' }, [selo('termometro', true), el('div', null, [
+      el('h2', { text: 'O que você sente agora?' }),
+      el('p', { class: 'ajuda', text: 'Escolha a intensidade de cada sintoma. Sem marcar, vale "Nenhum".' })
+    ])]));
     L.SINTOMAS.forEach(function (item) {
-      var fieldset = el('fieldset', { class: 'resp-sintoma' });
-      fieldset.appendChild(el('legend', { text: item.rotulo }));
-      var linha = el('div', { class: 'resp-linha' });
+      var linha = el('div', { class: 'resp-linha sev' });
       L.ROTULOS_GRAVIDADE.forEach(function (rot, valor) {
         var id = 's_' + item.id + '_' + valor;
         var input = el('input', { type: 'radio', name: 's_' + item.id, id: id, value: String(valor) });
         if ((estado.gravidades[item.id] || 0) === valor) input.checked = true;
         input.addEventListener('change', function () { estado.gravidades[item.id] = valor; });
-        linha.appendChild(el('label', { for: id }, [input, document.createTextNode(rot)]));
+        linha.appendChild(opcao(input, rot, null, 'g' + valor));
       });
-      fieldset.appendChild(linha);
-      secao.appendChild(fieldset);
+      secao.appendChild(bloco(item.id, item.rotulo, null, linha, 'fieldset'));
     });
   }
 
   function construirExposicao() {
     var secao = $('etapa-1');
     secao.innerHTML = '';
-    secao.appendChild(grupoRadio('Onde você está agora?', LOCAIS, estado.contexto.local || null, function (v) { estado.contexto.local = v; }));
-    secao.appendChild(simNao('Dá para ver ou sentir cheiro de fumaça?', SIM_NAO.visivel.campo));
+    secao.appendChild(grupoRadio('Onde você está agora?', LOCAIS, estado.contexto.local || null, function (v) { estado.contexto.local = v; }, null, 'local'));
+    secao.appendChild(simNao('Dá para ver ou sentir cheiro de fumaça?', SIM_NAO.visivel.campo, null, 'fumaca'));
     secao.appendChild(grupoRadio('Quanto tempo ficou ao ar livre hoje?', EXPOSICOES, estado.exposicao, function (v) { estado.exposicao = v; },
-      'Soma do dia todo. Os cortes de 1 h e 4 h são escolha do projeto.'));
-    secao.appendChild(grupoRadio('Que proteção usou ao sair hoje?', MASCARAS, estado.contexto.mascara || null, function (v) { estado.contexto.mascara = v; }));
-    secao.appendChild(simNao(SIM_NAO.exercicio.r, SIM_NAO.exercicio.campo));
-    secao.appendChild(simNao(SIM_NAO.trabalho.r, SIM_NAO.trabalho.campo));
-    secao.appendChild(simNao(SIM_NAO.filtrado.r, SIM_NAO.filtrado.campo, SIM_NAO.filtrado.ajuda));
+      'Soma do dia todo. Os cortes de 1 h e 4 h são escolha do projeto.', 'relogio'));
+    secao.appendChild(grupoRadio('Que proteção usou ao sair hoje?', MASCARAS, estado.contexto.mascara || null, function (v) { estado.contexto.mascara = v; }, null, 'mascara'));
+    secao.appendChild(simNao(SIM_NAO.exercicio.r, SIM_NAO.exercicio.campo, null, 'exercicio'));
+    secao.appendChild(simNao(SIM_NAO.trabalho.r, SIM_NAO.trabalho.campo, null, 'trabalho'));
+    secao.appendChild(simNao(SIM_NAO.filtrado.r, SIM_NAO.filtrado.campo, SIM_NAO.filtrado.ajuda, 'filtrado'));
   }
 
   function construirSobreVoce() {
     var secao = $('etapa-2');
     secao.innerHTML = '';
-    secao.appendChild(el('h2', { text: 'Algum destes se aplica a você?' }));
-    secao.appendChild(el('p', { class: 'ajuda', text: 'Esses grupos têm maior risco com a fumaça. Toque para marcar.' }));
     var linha = el('div', { class: 'resp-linha' });
     PERFIS.forEach(function (p) {
       var id = 'p_' + p.k;
       var input = el('input', { type: 'checkbox', id: id });
       input.checked = !!estado.perfil[p.k];
       input.addEventListener('change', function () { estado.perfil[p.k] = input.checked; });
-      linha.appendChild(el('label', { for: id }, [input, document.createTextNode(p.r)]));
+      linha.appendChild(opcao(input, p.r, p.k));
     });
-    secao.appendChild(linha);
-    secao.appendChild(simNao(SIM_NAO.imunidade.r, SIM_NAO.imunidade.campo));
-    secao.appendChild(simNao(SIM_NAO.medicacao.r, SIM_NAO.medicacao.campo, SIM_NAO.medicacao.ajuda));
+    secao.appendChild(bloco('pessoa', 'Algum destes se aplica a você?', 'Esses grupos têm maior risco com a fumaça. Toque para marcar.', linha));
+    secao.appendChild(simNao(SIM_NAO.imunidade.r, SIM_NAO.imunidade.campo, null, 'imunologica'));
+    secao.appendChild(simNao(SIM_NAO.medicacao.r, SIM_NAO.medicacao.campo, SIM_NAO.medicacao.ajuda, 'medicacao_a_mao'));
   }
 
   function construirAgora() {
     var secao = $('etapa-3');
     secao.innerHTML = '';
-    secao.appendChild(simNao(SIM_NAO.piorando.r, SIM_NAO.piorando.campo));
-    secao.appendChild(simNao(SIM_NAO.naoAlivia.r, SIM_NAO.naoAlivia.campo, SIM_NAO.naoAlivia.ajuda));
+    secao.appendChild(simNao(SIM_NAO.piorando.r, SIM_NAO.piorando.campo, null, 'piorando'));
+    secao.appendChild(simNao(SIM_NAO.naoAlivia.r, SIM_NAO.naoAlivia.campo, SIM_NAO.naoAlivia.ajuda, 'medicacao_nao_alivia'));
+  }
+
+  // Nomes das etapas: os mesmos do app (`_stepTitles` em questionnaire_screen.dart).
+  var PASSOS = [
+    { r: 'Sintomas', i: 'termometro' },
+    { r: 'Exposição', i: 'vento' },
+    { r: 'Sobre você', i: 'pessoa' },
+    { r: 'Agora', i: 'alerta' }
+  ];
+
+  function construirPassos() {
+    var ol = $('passos');
+    ol.innerHTML = '';
+    PASSOS.forEach(function (p, n) {
+      ol.appendChild(el('li', { id: 'passo-' + n }, [
+        el('span', { class: 'resp-passo-bolha', 'aria-hidden': 'true' }, [ico(p.i, 20)]),
+        el('span', { text: p.r })
+      ]));
+    });
   }
 
   function mostrarEtapa() {
-    for (var i = 0; i < ETAPAS; i++) $('etapa-' + i).hidden = i !== estado.etapa;
+    for (var i = 0; i < ETAPAS; i++) {
+      $('etapa-' + i).hidden = i !== estado.etapa;
+      var li = $('passo-' + i);
+      if (li) {
+        li.className = i < estado.etapa ? 'feito' : i === estado.etapa ? 'atual' : '';
+        if (i === estado.etapa) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+      }
+    }
     $('voltar').hidden = estado.etapa === 0;
-    $('continuar').textContent = estado.etapa === ETAPAS - 1 ? 'Ver minha orientação' : 'Continuar';
-    $('progresso').textContent = 'Etapa ' + (estado.etapa + 1) + ' de ' + ETAPAS;
+    rotuloBotao($('voltar'), 'Voltar', 'seta_esq');
+    rotuloBotao($('continuar'), estado.etapa === ETAPAS - 1 ? 'Ver minha orientação' : 'Continuar',
+      estado.etapa === ETAPAS - 1 ? 'ok' : 'seta_dir', true);
+    $('progresso').textContent = 'Etapa ' + (estado.etapa + 1) + ' de ' + ETAPAS + ' · ' + PASSOS[estado.etapa].r;
+    $('barra').style.width = ((estado.etapa + 1) * 100 / ETAPAS) + '%';
     window.scrollTo(0, 0);
   }
 
@@ -213,11 +279,14 @@
     secao.innerHTML = '';
     secao.appendChild(el('h2', { text: 'Sua orientação' }));
     var emergencia = r.nivel === 'emergency';
-    secao.appendChild(el('div', { class: 'resp-aviso' + (emergencia ? ' emergencia' : ''), text: L.ROTULOS_NIVEL[r.nivel] }));
+    secao.appendChild(el('div', { class: 'resp-nivel nivel-' + r.nivel }, [
+      el('span', { class: 'resp-ico', 'aria-hidden': 'true' }, [ico('nivel_' + r.nivel, 28)]),
+      el('strong', { text: L.ROTULOS_NIVEL[r.nivel] })
+    ]));
     if (emergencia) {
-      secao.appendChild(el('p', { class: 'resp-aviso emergencia' }, [
-        el('a', { href: 'tel:192', text: 'Ligar SAMU 192' })
-      ]));
+      var ligar = el('a', { href: 'tel:192', class: 'resp-btn' });
+      rotuloBotao(ligar, 'Ligar SAMU 192', 'nivel_emergency');
+      secao.appendChild(el('p', { class: 'resp-samu' }, [ligar]));
     }
     secao.appendChild(el('p', { class: 'ajuda', text: 'Pontuação: ' + r.pontos + '. ' + TEXTO_PONTUACAO }));
     secao.appendChild(el('p', { class: 'ajuda', text: 'O app RespirAR Amazonas traz as orientações completas para cada nível de risco.' }));
@@ -336,11 +405,13 @@
       $('status').textContent = 'Não foi possível carregar o questionário. Recarregue a página.';
       return;
     }
+    construirPassos();
     construirSintomas();
     construirExposicao();
     construirSobreVoce();
     construirAgora();
     montarTermo();
+    preencherIcones();
     mostrarEtapa();
 
     $('voltar').addEventListener('click', function () { if (estado.etapa > 0) ir(estado.etapa - 1); });

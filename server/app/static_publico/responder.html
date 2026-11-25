@@ -10,37 +10,130 @@
   <link rel="stylesheet" href="../assets/publico.css">
   <style>
     .resp-wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
-    .resp-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; margin: 12px 0; }
-    .resp-card h2 { font-size: 1.15rem; margin: 0 0 6px; }
-    .resp-card .ajuda { color: var(--muted); font-size: .92rem; margin: 0 0 12px; }
+    svg.ico { display: block; flex: none; }
+
+    /* topo */
+    .resp-topo { background: radial-gradient(900px 300px at 90% -30%, rgba(156,204,101,.35), transparent 60%), linear-gradient(160deg, #1B5E20, #0F3D14); color: #fff; padding: 18px 0 26px; }
+    .resp-topo .resp-wrap { padding-top: 0; padding-bottom: 0; }
+    .resp-voltar { display: inline-flex; align-items: center; gap: 6px; color: #DCEEDD; text-decoration: none; font-weight: 600; font-size: .92rem; padding: 6px 0; min-height: 44px; }
+    .resp-voltar:hover { color: #fff; }
+    .resp-titulo { display: flex; align-items: center; gap: 14px; margin-top: 2px; }
+    .resp-logo { width: 56px; height: 56px; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.3); flex: none; }
+    .resp-titulo h1 { font-size: clamp(1.35rem, 4.5vw, 1.8rem); margin: 0; }
+    .resp-titulo p { margin: 4px 0 0; color: #DCEEDD; font-size: .92rem; }
+    .resp-anonimo { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.14); font-size: .85rem; }
+
+    /* passos */
+    .resp-passos { list-style: none; display: flex; margin: -18px 0 0; padding: 12px 8px 10px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); position: relative; }
+    .resp-passos li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .78rem; color: var(--muted); text-align: center; position: relative; }
+    .resp-passo-bolha { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--soft); border: 2px solid var(--line); color: var(--muted); transition: background .25s, color .25s, border-color .25s, transform .25s; }
+    .resp-passos li.atual { color: var(--ink); font-weight: 700; }
+    .resp-passos li.atual .resp-passo-bolha { background: var(--brand); border-color: var(--brand); color: #fff; transform: scale(1.08); }
+    .resp-passos li.feito .resp-passo-bolha { background: var(--soft); border-color: var(--brand); color: var(--brand); }
+    .resp-passos li + li::before { content: ""; position: absolute; top: 20px; right: 50%; width: 100%; height: 2px; background: var(--line); z-index: 0; }
+    .resp-passos li.feito::before, .resp-passos li.atual::before { background: var(--brand); }
+    .resp-passo-bolha { position: relative; z-index: 1; }
+    .resp-barra { height: 6px; border-radius: 999px; background: var(--line); margin: 12px 4px 0; overflow: hidden; }
+    .resp-barra span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--accent)); border-radius: 999px; transition: width .35s ease; }
+    .resp-progresso { color: var(--muted); font-size: .9rem; }
+    #progresso { margin: 10px 2px 0; }
+
+    /* cartões e perguntas */
+    .resp-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); padding: 18px; margin: 12px 0; }
+    .resp-card h2 { font-size: 1.1rem; margin: 0; }
+    .resp-card .ajuda { color: var(--muted); font-size: .9rem; margin: 4px 0 0; }
+    .resp-intro { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
+    .resp-q { padding: 16px 0; border-top: 1px solid var(--line); }
+    .resp-intro + .resp-q, .resp-card > .resp-q:first-child { border-top: 0; }
+    .resp-q-cab { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .resp-q-cab > div { min-width: 0; padding-top: 2px; }
+    .resp-q-cab h2, .resp-q-cab legend { font-size: 1rem; font-weight: 700; margin: 0; padding: 0; line-height: 1.3; }
+    .resp-sintoma { border: 0; margin: 0; min-width: 0; }
+    .resp-sintoma legend { float: left; width: 100%; }
+    .resp-sintoma legend + * { clear: both; }
+    .resp-ico { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; background: var(--soft); color: var(--brand); border: 1px solid var(--line); }
+    .resp-ico.grande { width: 52px; height: 52px; border-radius: 16px; background: var(--brand); border-color: var(--brand); color: #fff; }
+
+    /* opções (rádio e caixa viram "pílulas"; o input fica acessível, só invisível) */
     .resp-linha { display: flex; flex-wrap: wrap; gap: 8px; }
-    .resp-linha label { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; min-height: 44px; cursor: pointer; background: var(--soft); }
-    .resp-linha input { width: 18px; height: 18px; accent-color: var(--brand); }
-    .resp-sintoma { border-top: 1px solid var(--line); padding: 12px 0; }
-    .resp-sintoma:first-of-type { border-top: 0; }
-    .resp-sintoma legend { font-weight: 700; margin-bottom: 6px; }
+    .resp-linha label { position: relative; cursor: pointer; display: inline-flex; }
+    .resp-linha input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .resp-pilula { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 16px; min-height: 44px; background: var(--soft); font-weight: 600; font-size: .95rem; transition: background .15s, border-color .15s, color .15s, transform .1s; }
+    .resp-linha label:hover .resp-pilula { border-color: var(--brand); }
+    .resp-linha label:active .resp-pilula { transform: scale(.97); }
+    .resp-linha input:checked + .resp-pilula { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .resp-linha input:focus-visible + .resp-pilula { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .resp-linha input:checked + .resp-pilula::after { content: "\2713"; font-weight: 800; margin-left: 2px; }
+    .resp-linha.sev input:checked + .resp-pilula::after { content: none; }
+    .resp-linha.sev { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .resp-linha.sev label { display: block; }
+    .resp-linha.sev .resp-pilula { width: 100%; justify-content: center; padding: 10px 4px; font-size: .88rem; }
+    .resp-linha.sev .g0 input:checked + .resp-pilula { background: #E3F1E4; border-color: #2E7D32; color: #1B5E20; }
+    .resp-linha.sev .g1 input:checked + .resp-pilula { background: #9CCC65; border-color: #7CB342; color: #17260B; }
+    .resp-linha.sev .g2 input:checked + .resp-pilula { background: #F2A93B; border-color: #D98E1F; color: #3A2600; }
+    .resp-linha.sev .g3 input:checked + .resp-pilula { background: #D84315; border-color: #BF360C; color: #fff; }
+
+    /* botões */
     .resp-acoes { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-    .resp-btn { border: 0; border-radius: 999px; padding: 12px 20px; min-height: 48px; font-weight: 700; cursor: pointer; background: var(--brand); color: #fff; font-size: 1rem; }
+    .resp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; padding: 12px 22px; min-height: 48px; font-weight: 700; cursor: pointer; background: var(--brand); color: #fff; font-size: 1rem; text-decoration: none; transition: filter .15s, transform .1s; }
+    .resp-btn:hover:not(:disabled) { filter: brightness(1.08); }
+    .resp-btn:active:not(:disabled) { transform: scale(.98); }
+    .resp-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
     .resp-btn.sec { background: var(--soft); color: var(--brand-d); border: 1px solid var(--line); }
     .resp-btn:disabled { opacity: .5; cursor: not-allowed; }
+    #navegacao #continuar { margin-left: auto; }
+
+    /* resultado */
+    .resp-nivel { display: flex; align-items: center; gap: 14px; border-radius: 16px; padding: 14px 16px; margin: 12px 0 4px; color: #fff; background: var(--low); }
+    .resp-nivel .resp-ico { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.35); color: #fff; width: 52px; height: 52px; border-radius: 50%; }
+    .resp-nivel strong { font-size: 1.05rem; line-height: 1.3; }
+    .resp-nivel.nivel-low { background: #2E7D32; }
+    .resp-nivel.nivel-moderate { background: #8A5A00; }
+    .resp-nivel.nivel-high { background: #D84315; }
+    .resp-nivel.nivel-emergency { background: #B71C1C; }
+    .resp-nivel.nivel-emergency .resp-ico { animation: resp-pulso 1.8s ease-in-out infinite; }
+    @keyframes resp-pulso { 50% { box-shadow: 0 0 0 8px rgba(255,255,255,.18); } }
     .resp-aviso { border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--soft); }
     .resp-aviso.emergencia { background: #FDECEA; color: #7F1D1D; border: 1px solid #F5C2C0; font-weight: 600; }
+    .resp-samu { margin: 10px 0 0; }
+    .resp-samu .resp-btn { background: #B71C1C; }
+
+    /* consentimento */
     .resp-termo { max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: .92rem; }
     .resp-termo h3 { font-size: 1rem; margin: 14px 0 4px; }
     .resp-termo p { margin: 6px 0; }
     .resp-check { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; }
     .resp-check input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--brand); flex: none; }
     .resp-status { min-height: 1.4em; margin-top: 10px; font-weight: 600; }
-    .resp-progresso { color: var(--muted); font-size: .9rem; }
-    @media (max-width: 480px) { .resp-wrap { padding: 12px; } }
+    #concluido .resp-intro { margin: 0; }
+    #mensagem-final { font-weight: 600; }
+
+    @media (max-width: 480px) {
+      .resp-wrap { padding: 12px; }
+      .resp-passos li { font-size: .72rem; }
+      .resp-passo-bolha { width: 36px; height: 36px; }
+      .resp-passos li + li::before { top: 18px; }
+      .resp-card { padding: 14px; }
+      .resp-pilula { padding: 10px 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .resp-nivel.nivel-emergency .resp-ico { animation: none; }
+      .resp-barra span, .resp-passo-bolha { transition: none; }
+    }
   </style>
 </head>
 <body>
-  <header class="top" style="padding:16px">
-    <div class="resp-wrap" style="padding:0">
-      <a href="../" style="text-decoration:none;color:inherit;font-weight:700">&larr; RespirAR Amazonas</a>
-      <h1 style="font-size:1.5rem;margin:8px 0 0">Responder o questionário</h1>
-      <p style="margin:6px 0 0;color:var(--muted)">Suas respostas são anônimas: não pedimos nome, telefone nem e-mail. Enviar é opcional.</p>
+  <header class="resp-topo">
+    <div class="resp-wrap">
+      <a class="resp-voltar" href="../" data-icone="seta_esq">RespirAR Amazonas</a>
+      <div class="resp-titulo">
+        <img class="resp-logo" src="../assets/logo.png" width="56" height="56" alt="">
+        <div>
+          <h1>Responder o questionário</h1>
+          <p>Conte como você está durante episódios de fumaça.</p>
+        </div>
+      </div>
+      <span class="resp-anonimo" data-icone="cadeado" data-tam="16">Anônimo: não pedimos nome, telefone nem e-mail. Enviar é opcional.</span>
     </div>
   </header>
 
@@ -49,6 +142,8 @@
       <div class="resp-aviso">Este questionário precisa de JavaScript ativado no navegador.</div>
     </noscript>
 
+    <ol class="resp-passos" id="passos" aria-label="Etapas do questionário"></ol>
+    <div class="resp-barra" aria-hidden="true"><span id="barra"></span></div>
     <p class="resp-progresso" id="progresso" aria-live="polite"></p>
 
     <!-- Etapas: o JavaScript (responder.js) preenche cada uma. A ordem é a do app. -->
@@ -59,15 +154,15 @@
       <section class="resp-card" id="etapa-3" hidden></section>
 
       <div class="resp-acoes" id="navegacao">
-        <button type="button" class="resp-btn sec" id="voltar">Voltar</button>
-        <button type="button" class="resp-btn" id="continuar">Continuar</button>
+        <button type="button" class="resp-btn sec" id="voltar"></button>
+        <button type="button" class="resp-btn" id="continuar"></button>
       </div>
     </form>
 
     <section class="resp-card" id="resultado" hidden aria-live="polite"></section>
 
     <section class="resp-card" id="consentimento" hidden>
-      <h2>Quer enviar estas respostas para o estudo?</h2>
+      <div class="resp-intro"><span class="resp-ico grande" data-icone="cadeado" data-tam="26"></span><h2>Quer enviar estas respostas para o estudo?</h2></div>
       <p class="ajuda" id="resumo-termo"></p>
       <details>
         <summary>Ler o termo completo (versão <span id="versao-termo"></span>)</summary>
@@ -85,13 +180,13 @@
 
       <div class="resp-acoes">
         <button type="button" class="resp-btn sec" id="nao-enviar">Não enviar</button>
-        <button type="button" class="resp-btn" id="enviar" disabled>Enviar respostas</button>
+        <button type="button" class="resp-btn" id="enviar" data-icone="enviar" data-tam="20" disabled>Enviar respostas</button>
       </div>
       <p class="resp-status" id="status" role="status"></p>
     </section>
 
     <section class="resp-card" id="concluido" hidden>
-      <p id="mensagem-final" style="margin:0"></p>
+      <div class="resp-intro"><span class="resp-ico grande" data-icone="ok" data-tam="26"></span><p id="mensagem-final" style="margin:0"></p></div>
     </section>
 
     <p class="resp-progresso" style="margin-top:20px">
@@ -102,6 +197,7 @@
 
   <script src="../assets/firebase_web.js"></script>
   <script src="../assets/responder_termo.js"></script>
+  <script src="../assets/responder_icones.js"></script>
   <script src="../assets/responder_logica.js"></script>
   <script src="../assets/responder.js"></script>
 </body>

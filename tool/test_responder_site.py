@@ -213,3 +213,62 @@ def test_link_do_formulario_so_no_modo_estatico():
     conectado = gerar_pages.transformar_html(txt, "https://respirar-amazonas.cloud", gerar_pages.URL_PADRAO, "0")
     assert 'href="responder/"' in estatico and "data-so-estatico" not in estatico
     assert "responder-link" not in conectado
+
+
+# ---------------------------------------------------------------- ícones e botão de acesso
+ICONES_JS = FONTE / "responder_icones.js"
+
+
+def _nomes_de_icones():
+    return _node(
+        f"const I = require({json.dumps(str(ICONES_JS))});"
+        "console.log(JSON.stringify(Object.keys(I.ICONES)));"
+    )
+
+
+def test_todo_sintoma_e_pergunta_tem_icone():
+    nomes = set(_nomes_de_icones())
+    ids = _node(_logica_js("out.ids = L.SINTOMAS.map(s => s.id);"))["ids"]
+    assert set(ids) <= nomes, set(ids) - nomes
+    js = JS_RESPONDER.read_text(encoding="utf-8")
+    # todo nome de ícone citado em responder.js (ico('x'), selo('x'), icone 'x', p.i, nivel_) existe
+    citados = set(re.findall(r"(?:ico|selo)\('([a-z_]+)'", js))
+    citados |= set(re.findall(r"\bi: '([a-z_]+)'", js))
+    citados |= set(re.findall(r"(?:null|\)), '([a-z_]+)'\)\);", js))
+    citados |= set(re.findall(r"rotuloBotao\([^,]+, [^,]+, '([a-z_]+)'", js))
+    citados.discard('nivel_')  # prefixo; os 4 níveis são conferidos abaixo
+    assert citados and citados <= nomes, citados - nomes
+    for nivel in ("low", "moderate", "high", "emergency"):
+        assert f"nivel_{nivel}" in nomes
+    for chave in ("idoso", "gestante", "crianca", "doenca_respiratoria", "doenca_cardiaca"):
+        assert chave in nomes  # ícones dos perfis (p.k)
+
+
+def test_icones_sao_svg_bem_formados():
+    import xml.etree.ElementTree as ET
+    svgs = _node(
+        f"const I = require({json.dumps(str(ICONES_JS))});"
+        "const o = {}; Object.keys(I.ICONES).forEach(k => o[k] = I.ICONES[k]);"
+        "console.log(JSON.stringify(o));"
+    )
+    assert len(svgs) >= 40
+    for nome, interno in svgs.items():
+        ET.fromstring(f"<svg xmlns='http://www.w3.org/2000/svg'>{interno}</svg>")  # levanta se malformado
+    assert _node(
+        f"const I = require({json.dumps(str(ICONES_JS))});console.log(JSON.stringify(I.icone === undefined));"
+    ) is False
+
+
+def test_pagina_do_formulario_carrega_os_icones_antes_do_script():
+    html = HTML_RESPONDER.read_text(encoding="utf-8")
+    assert html.index("assets/responder_icones.js") < html.index("assets/responder.js")
+    assert 'src="../assets/logo.png"' in html
+
+
+def test_botao_do_questionario_na_pagina_inicial():
+    txt = (FONTE / "publico.html").read_text(encoding="utf-8")
+    estatico = gerar_pages.transformar_html(txt, None, gerar_pages.URL_PADRAO, "0")
+    conectado = gerar_pages.transformar_html(txt, "https://respirar-amazonas.cloud", gerar_pages.URL_PADRAO, "0")
+    assert 'class="cta-questionario" href="responder/"' in estatico
+    assert "<svg" in estatico.split("cta-questionario", 1)[1].split("</a>", 1)[0]
+    assert "cta-questionario" not in conectado

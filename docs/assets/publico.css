@@ -215,3 +215,18 @@ main{display:grid;gap:16px;padding:18px 0 8px;margin-top:-4px}
 @media (prefers-reduced-motion:reduce){.prog-barra{transition:none}}
 .app-nota a{color:#fff;font-weight:600;text-decoration:underline}.app-meta code{font-size:.82em;word-break:break-all}
 .ar-atualizacao{margin:6px 0 10px;font-weight:600;color:var(--ink)}
+
+/* botão que leva ao questionário (só no modo estático; ver tool/gerar_pages.py) */
+.responder-link{margin:0 0 16px}
+.cta-questionario{display:inline-flex;align-items:center;gap:14px;max-width:100%;padding:10px 16px 10px 10px;border-radius:18px;background:#fff;color:#0F3D14;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s}
+.cta-questionario:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.3)}
+.cta-questionario:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.cta-ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none;background:linear-gradient(160deg,#2E7D32,#1B5E20);color:#fff}
+.cta-svg{display:block}
+.cta-txt{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.cta-txt strong{font-size:1.02rem}
+.cta-txt small{color:#4A5E4D;font-size:.8rem;margin-top:2px}
+.cta-seta{display:grid;place-items:center;flex:none;color:#2E7D32;transition:transform .15s}
+.cta-questionario:hover .cta-seta{transform:translateX(3px)}
+@media (max-width:520px){.cta-questionario{display:flex;width:100%}.cta-txt{flex:1}}
+@media (prefers-reduced-motion:reduce){.cta-questionario,.cta-seta{transition:none}}

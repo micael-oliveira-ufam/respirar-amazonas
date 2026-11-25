@@ -589,6 +589,11 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - **NÃO verificado:** a restrição de domínio e de API em si (o Google aplica, mas o envio com sucesso comprova só a chave, não a negativa de outros domínios); o uso de `localhost` agora é recusado pela chave, o que é esperado.
 - **Pendências:** a Browser key antiga segue sem restrição (só restringir depois de confirmar qual chave o app Android usa no `google-services.json`); lacuna LGPD da versão do termo no documento (ver 4.57).
 
+### 4.60 Visual do questionário no site e botão de acesso (25/11/2026, sem versão nova)
+- Pedido do usuário: melhorar o visual do formulário do site, com ícones sugestivos por pergunta, e criar um ícone que leve ao questionário. Feito em `responder.html`, `responder.js`, novo `responder_icones.js` (41 ícones SVG desenhados à mão, 24x24, traço 1,8) e botão `.cta-questionario` em `publico.html`/`publico.css`. Perguntas, textos, pontuação e payload **não mudaram**; o subtítulo do topo é texto novo meu (sem afirmações numéricas).
+- **Verificado:** `python3 -m pytest tool -q` = 112 aprovados; `cd server && python3 -m pytest -q` = 188 aprovados; Chromium (Playwright) em 390 px e 1100 px, claro e escuro, etapas 1 a 4, resultado de emergência e botão da página inicial, sem erro de console nem violação de CSP; cor final da pílula "Intenso" conferida (`rgb(216,67,21)`, texto branco).
+- **Não verificado:** o site publicado no github.io, leitores de tela (há `aria-hidden` nos ícones, `aria-current` na etapa e foco visível, mas nenhum teste com tecnologia assistiva), contraste medido por ferramenta (só conferido a olho), aparência em Safari/Firefox, e se o significado dos ícones é claro para o público (nenhum teste com usuários). O formulário que está no ar só muda depois do `git push` de `docs/`.
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).
