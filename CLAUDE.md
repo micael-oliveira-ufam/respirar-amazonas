@@ -575,6 +575,10 @@ Pedido: “Implemente tudo o que foi anexado no pdf.” Implementado em `lib/dat
 - **Riscos conhecidos:** escrita anônima sem App Check (possível spam; `firestore.rules` só limita o formato); a chave web do Firebase não é segredo, mas deve ser restrita ao domínio `https://micael-oliveira-ufam.github.io/*` no Google Cloud; o site não mostra o texto completo de orientação do app (só nível, pontuação e pontos de atenção); o painel e as estatísticas do app ainda leem o FastAPI, então as respostas do site só aparecem no retrato do Firestore (`tool/publicar_dados_firestore.py`) e no workflow de 6 em 6 horas.
 - **Pendências do usuário:** (1) registrar app Web no projeto `respirar-as` e colar `firebaseConfig` em `firebase_web.js`; (2) restringir a chave de API ao domínio do Pages; (3) testar um envio pelo site; (4) decidir o tempo real (Blaze + função vs. resumo pelo workflow a cada 10–15 min); (5) enviar a saída de `flutter analyze` e `flutter test`.
 
+### 4.58 Gerador do Pages: ordem segura (correção, sem versão nova)
+- Incidente (25/11/2026): `gerar_pages.py` moveu `docs/dados/` para `docs.dados.tmp/` e parou por falta do `segno`; os retratos ficaram fora do lugar até serem restaurados (diff vazio com o Git depois). Corrigido: preparar tudo antes de mexer em `docs/` e devolver `dados/` em caso de erro. Testes: `tool/test_gerar_pages.py` (22 aprovados).
+- Regra: depois de mudar o gerador, rodar `python3 tool/gerar_pages.py` e conferir `git status docs` (deve ficar vazio se nada do site mudou).
+
 ### 4.10 Pendências e dívidas conhecidas
 - **Rodar `flutter pub get`, `flutter analyze` e `flutter test`** após a 1.2.0 e enviar a saída (todo o Dart novo é não compilado pelo agente).
 - `git push origin v1.0.0 v1.1.0 v1.2.0` (tags locais).

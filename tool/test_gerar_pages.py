@@ -131,3 +131,34 @@ def test_endereco_do_site_no_app_e_o_mesmo_do_gerador():
     dart = (RAIZ / "lib/widgets/platform_card.dart").read_text(encoding="utf-8")
     no_app = re.search(r"kSitePublicoUrl = '([^']+)'", dart).group(1)
     assert no_app.rstrip("/") == gp.URL_PADRAO.rstrip("/")
+
+
+def test_falha_no_meio_nao_deixa_dados_fora_do_lugar(tmp_path, monkeypatch):
+    """Regressão (25/11/2026): se a escrita falhar, docs/dados/ volta ao lugar em vez de ficar em .dados.tmp."""
+    import pytest
+    saida = tmp_path / "docs"
+    (saida / "dados").mkdir(parents=True)
+    (saida / "dados" / "manifest.json").write_text('{"ok": 1}', encoding="utf-8")
+
+    def falha(*a, **k):
+        raise RuntimeError("falha simulada")
+    monkeypatch.setattr(gp, "_escrever", falha)
+    with pytest.raises(RuntimeError):
+        gp.gerar(saida, None, gp.URL_PADRAO, gp.APK_URL_PADRAO)
+    assert (saida / "dados" / "manifest.json").read_text(encoding="utf-8") == '{"ok": 1}'
+    assert not (tmp_path / "docs.dados.tmp").exists()
+
+
+def test_falha_de_dependencia_nao_mexe_em_docs(tmp_path, monkeypatch):
+    """Dependência ausente (ex.: segno) falha ANTES de qualquer movimento: docs/ fica intacta."""
+    import pytest
+    saida = tmp_path / "docs"
+    (saida / "dados").mkdir(parents=True)
+    (saida / "dados" / "manifest.json").write_text("x", encoding="utf-8")
+
+    def sem_segno(*a, **k):
+        raise SystemExit("Falta o pacote segno")
+    monkeypatch.setattr(gp, "qr_svg", sem_segno)
+    with pytest.raises(SystemExit):
+        gp.gerar(saida, None, gp.URL_PADRAO, gp.APK_URL_PADRAO)
+    assert (saida / "dados" / "manifest.json").read_text(encoding="utf-8") == "x"

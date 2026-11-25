@@ -133,6 +133,14 @@ def municipios_json() -> str:
 
 def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PADRAO) -> str:
     versao = (RAIZ / "VERSION").read_text(encoding="utf-8").strip()
+    # 1) Prepara TUDO o que pode falhar (dependências, arquivos) antes de tocar em `saida`.
+    #    Motivo: em 25/11/2026 uma falha de dependência (segno) deixou docs/dados/ fora do lugar.
+    municipios = qr = manual = None
+    if api is None:
+        municipios = municipios_json()
+        qr = qr_svg(apk_url)
+        manual = MANUAL_PDF.read_bytes()
+    # 2) Guarda os retratos publicados (docs/dados/) fora da pasta que será recriada.
     guardado = None
     if saida.exists():
         if (saida / "dados").is_dir():          # retratos publicados por tool/publicar_dados_pages.py
@@ -141,6 +149,22 @@ def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PA
                 shutil.rmtree(guardado)
             shutil.move(str(saida / "dados"), guardado)
         shutil.rmtree(saida)
+    # 3) Escreve o site. Se algo falhar, devolve os retratos a docs/dados/ e repassa o erro.
+    try:
+        build = _escrever(saida, api, url_site, apk_url, versao, municipios, qr, manual)
+    except BaseException:
+        if guardado is not None and guardado.exists():
+            shutil.rmtree(saida, ignore_errors=True)
+            saida.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(guardado), saida / "dados")
+        raise
+    if guardado is not None:
+        shutil.move(str(guardado), saida / "dados")
+    return build
+
+
+def _escrever(saida: Path, api: str | None, url_site: str, apk_url: str, versao: str,
+              municipios: str | None, qr: bytes | None, manual: bytes | None) -> str:
     (saida / "assets").mkdir(parents=True)
     for arq in sorted(FONTE.iterdir()):
         if arq.is_file() and arq.name not in ("publico.html", "config.js", "responder.html"):
@@ -154,9 +178,9 @@ def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PA
            f"window.RESPIRAR_API = '{api or ''}';\n")
     if api is None:
         cfg += f"window.RESPIRAR_APK_URL = '{apk_url}';\n"
-        (saida / "assets" / "municipios_am.json").write_text(municipios_json(), encoding="utf-8")
-        (saida / "assets" / "qr-app.svg").write_bytes(qr_svg(apk_url))
-        shutil.copy2(MANUAL_PDF, saida / "assets" / "Manual-Instalacao-RespirAR-Amazonas.pdf")
+        (saida / "assets" / "municipios_am.json").write_text(municipios, encoding="utf-8")
+        (saida / "assets" / "qr-app.svg").write_bytes(qr)
+        (saida / "assets" / "Manual-Instalacao-RespirAR-Amazonas.pdf").write_bytes(manual)
     cfg += "window.respirarUrl = function (caminho) { return (window.RESPIRAR_API || '') + caminho; };\n"
     (saida / "assets" / "config.js").write_text(cfg, encoding="utf-8")
     html = transformar_html((FONTE / "publico.html").read_text(encoding="utf-8"), api, url_site, versao)
@@ -174,8 +198,6 @@ def gerar(saida: Path, api: str | None, url_site: str, apk_url: str = APK_URL_PA
         h.update(arq.read_bytes())
     build = h.hexdigest()[:12]
     (saida / "versao.json").write_text(json.dumps({"build": build, "versao": versao}) + "\n", encoding="utf-8")
-    if guardado is not None:
-        shutil.move(str(guardado), saida / "dados")
     return build
 
 

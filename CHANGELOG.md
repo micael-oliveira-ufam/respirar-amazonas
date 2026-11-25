@@ -20,6 +20,9 @@ Cada versão aponta para o commit de release (tag `vX.Y.Z`). Como publicar: `too
 - **Formulário do questionário no site** (`docs/responder/`, link "Responder o questionário" na página pública, só no modo estático). Pedido do usuário (25/11/2026): registrar as respostas pelo site, com o questionário completo, sem depender do app. O site grava direto no Firestore pelo SDK web, com a mesma pontuação do app (`responder_logica.js`), o mesmo termo de consentimento (`responder_termo.js`, gerado de `lib/data/lgpd_terms.dart` por `tool/gerar_termo_site.py`) e o mesmo documento que as regras aceitam (`firebase/firestore.rules`). Localização opcional, arredondada a 2 casas como no app. **Não verificado:** a página em navegador real, o envio ao Firestore e as regras em execução; a configuração web do Firebase (`firebase_web.js`) ainda está vazia, então o formulário mostra "envio indisponível" até ser preenchida.
 - `tool/test_responder_site.py` (11 testes): pontuação igual aos casos de `test/risk_assessment_test.dart`, campos do documento contra `firebase/firestore.rules`, termo e texto de pontuação iguais aos do app, SDK e política de segurança (CSP) do formulário.
 
+### Corrigido
+- **`tool/gerar_pages.py` podia deixar `docs/dados/` fora do lugar.** Numa execução interrompida por dependência ausente (`segno`), os retratos foram movidos para `docs.dados.tmp/` e não voltaram. Agora tudo o que pode falhar (QR code, JSON de municípios, manual) é preparado antes de mexer em `docs/`, e, se a escrita falhar, os retratos voltam a `docs/dados/` antes do erro ser repassado. Verificado: 2 testes de regressão em `tool/test_gerar_pages.py` (22 aprovados), e a regeração de `docs/` saiu idêntica ao commit anterior (build `8c98702de776`).
+
 ### Alterado
 - `tool/gerar_pages.py` gera `responder/index.html` com política de segurança própria (libera só o gstatic para o script e o Google para a conexão); o link do formulário na página pública aparece só no modo estático.
 
