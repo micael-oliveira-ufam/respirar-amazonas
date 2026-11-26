@@ -46,5 +46,11 @@
   "lon": -59.96,
   "bairro": "Novo Aleixo",
   "cidade": "Manaus"
+ },
+ {
+  "lat": -3.02,
+  "lon": -60.03,
+  "bairro": "Tarumã",
+  "cidade": "Manaus"
  }
 ]

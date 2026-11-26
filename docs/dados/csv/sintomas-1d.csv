@@ -1,12 +1,12 @@
 ﻿periodo_dias,gerado_em_utc,sintoma_id,sintoma,relatos,percentual_das_respostas,leve,moderado,intenso,gravidade_media_0a3
-1,2026-11-26T08:12:19.852415+00:00,nose,Coriza ou nariz irritado,16,84.2,9,5,2,1.56
-1,2026-11-26T08:12:19.852415+00:00,throat,Irritação ou dor na garganta,15,78.9,8,5,2,1.6
-1,2026-11-26T08:12:19.852415+00:00,headache,Dor de cabeça,13,68.4,7,4,2,1.62
-1,2026-11-26T08:12:19.852415+00:00,eyes,"Olhos ardendo, vermelhos ou lacrimejando",12,63.2,8,3,1,1.42
-1,2026-11-26T08:12:19.852415+00:00,fatigue,Cansaço fora do normal,12,63.2,4,4,4,2.0
-1,2026-11-26T08:12:19.852415+00:00,cough,Tosse,11,57.9,5,5,1,1.64
-1,2026-11-26T08:12:19.852415+00:00,dizzy,Tontura ou confusão,6,31.6,5,1,0,1.17
-1,2026-11-26T08:12:19.852415+00:00,dyspnea,Falta de ar,6,31.6,4,0,2,1.67
-1,2026-11-26T08:12:19.852415+00:00,wheeze,Chiado no peito,6,31.6,3,2,1,1.67
-1,2026-11-26T08:12:19.852415+00:00,chest,Aperto ou dor no peito,4,21.1,4,0,0,1.0
-1,2026-11-26T08:12:19.852415+00:00,palpitation,Palpitações ou batimentos irregulares,2,10.5,2,0,0,1.0
+1,2026-11-26T21:28:38.569011+00:00,nose,Coriza ou nariz irritado,8,100.0,3,3,2,1.88
+1,2026-11-26T21:28:38.569011+00:00,eyes,"Olhos ardendo, vermelhos ou lacrimejando",7,87.5,3,3,1,1.71
+1,2026-11-26T21:28:38.569011+00:00,fatigue,Cansaço fora do normal,7,87.5,4,1,2,1.71
+1,2026-11-26T21:28:38.569011+00:00,headache,Dor de cabeça,7,87.5,2,2,3,2.14
+1,2026-11-26T21:28:38.569011+00:00,throat,Irritação ou dor na garganta,7,87.5,2,3,2,2.0
+1,2026-11-26T21:28:38.569011+00:00,cough,Tosse,6,75.0,4,1,1,1.5
+1,2026-11-26T21:28:38.569011+00:00,dizzy,Tontura ou confusão,4,50.0,1,2,1,2.0
+1,2026-11-26T21:28:38.569011+00:00,wheeze,Chiado no peito,4,50.0,2,1,1,1.75
+1,2026-11-26T21:28:38.569011+00:00,dyspnea,Falta de ar,3,37.5,2,0,1,1.67
+1,2026-11-26T21:28:38.569011+00:00,chest,Aperto ou dor no peito,1,12.5,1,0,0,1.0
+1,2026-11-26T21:28:38.569011+00:00,palpitation,Palpitações ou batimentos irregulares,1,12.5,1,0,0,1.0
