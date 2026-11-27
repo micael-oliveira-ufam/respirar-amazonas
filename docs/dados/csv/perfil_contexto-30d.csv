@@ -1,39 +1,39 @@
 ﻿periodo_dias,gerado_em_utc,grupo,categoria,respostas
-30,2026-11-26T21:28:38.588350+00:00,perfil,idoso,0
-30,2026-11-26T21:28:38.588350+00:00,perfil,gestante,0
-30,2026-11-26T21:28:38.588350+00:00,perfil,crianca,0
-30,2026-11-26T21:28:38.588350+00:00,perfil,doenca_respiratoria,7
-30,2026-11-26T21:28:38.588350+00:00,perfil,doenca_cardiaca,1
-30,2026-11-26T21:28:38.588350+00:00,exposicao,under1h,19
-30,2026-11-26T21:28:38.588350+00:00,exposicao,between1and4h,6
-30,2026-11-26T21:28:38.588350+00:00,exposicao,over4h,2
-30,2026-11-26T21:28:38.588350+00:00,contexto:local,(total que respondeu),27
-30,2026-11-26T21:28:38.588350+00:00,contexto:local,casa_janelas_abertas,9
-30,2026-11-26T21:28:38.588350+00:00,contexto:local,casa_janelas_fechadas,18
-30,2026-11-26T21:28:38.588350+00:00,contexto:fumaca_visivel,(total que respondeu),26
-30,2026-11-26T21:28:38.588350+00:00,contexto:fumaca_visivel,nao,6
-30,2026-11-26T21:28:38.588350+00:00,contexto:fumaca_visivel,sim,20
-30,2026-11-26T21:28:38.588350+00:00,contexto:mascara,(total que respondeu),26
-30,2026-11-26T21:28:38.588350+00:00,contexto:mascara,cirurgica_pano,2
-30,2026-11-26T21:28:38.588350+00:00,contexto:mascara,nao,16
-30,2026-11-26T21:28:38.588350+00:00,contexto:mascara,nao_saiu,7
-30,2026-11-26T21:28:38.588350+00:00,contexto:mascara,pff2_n95,1
-30,2026-11-26T21:28:38.588350+00:00,contexto:atividade_fisica_ar_livre,(total que respondeu),26
-30,2026-11-26T21:28:38.588350+00:00,contexto:atividade_fisica_ar_livre,nao,26
-30,2026-11-26T21:28:38.588350+00:00,contexto:ar_filtrado,(total que respondeu),25
-30,2026-11-26T21:28:38.588350+00:00,contexto:ar_filtrado,nao,11
-30,2026-11-26T21:28:38.588350+00:00,contexto:ar_filtrado,sim,14
-30,2026-11-26T21:28:38.588350+00:00,contexto:trabalho_ar_livre,(total que respondeu),25
-30,2026-11-26T21:28:38.588350+00:00,contexto:trabalho_ar_livre,nao,24
-30,2026-11-26T21:28:38.588350+00:00,contexto:trabalho_ar_livre,sim,1
-30,2026-11-26T21:28:38.588350+00:00,contexto:imunologica,(total que respondeu),26
-30,2026-11-26T21:28:38.588350+00:00,contexto:imunologica,nao,24
-30,2026-11-26T21:28:38.588350+00:00,contexto:imunologica,sim,2
-30,2026-11-26T21:28:38.588350+00:00,contexto:medicacao_a_mao,(total que respondeu),20
-30,2026-11-26T21:28:38.588350+00:00,contexto:medicacao_a_mao,nao,20
-30,2026-11-26T21:28:38.588350+00:00,contexto:medicacao_nao_alivia,(total que respondeu),17
-30,2026-11-26T21:28:38.588350+00:00,contexto:medicacao_nao_alivia,nao,12
-30,2026-11-26T21:28:38.588350+00:00,contexto:medicacao_nao_alivia,sim,5
-30,2026-11-26T21:28:38.588350+00:00,contexto:piorando,(total que respondeu),20
-30,2026-11-26T21:28:38.588350+00:00,contexto:piorando,nao,11
-30,2026-11-26T21:28:38.588350+00:00,contexto:piorando,sim,9
+30,2026-11-27T08:24:03.969031+00:00,perfil,idoso,0
+30,2026-11-27T08:24:03.969031+00:00,perfil,gestante,0
+30,2026-11-27T08:24:03.969031+00:00,perfil,crianca,0
+30,2026-11-27T08:24:03.969031+00:00,perfil,doenca_respiratoria,8
+30,2026-11-27T08:24:03.969031+00:00,perfil,doenca_cardiaca,1
+30,2026-11-27T08:24:03.969031+00:00,exposicao,under1h,21
+30,2026-11-27T08:24:03.969031+00:00,exposicao,between1and4h,6
+30,2026-11-27T08:24:03.969031+00:00,exposicao,over4h,3
+30,2026-11-27T08:24:03.969031+00:00,contexto:local,(total que respondeu),30
+30,2026-11-27T08:24:03.969031+00:00,contexto:local,casa_janelas_abertas,9
+30,2026-11-27T08:24:03.969031+00:00,contexto:local,casa_janelas_fechadas,21
+30,2026-11-27T08:24:03.969031+00:00,contexto:fumaca_visivel,(total que respondeu),29
+30,2026-11-27T08:24:03.969031+00:00,contexto:fumaca_visivel,nao,6
+30,2026-11-27T08:24:03.969031+00:00,contexto:fumaca_visivel,sim,23
+30,2026-11-27T08:24:03.969031+00:00,contexto:mascara,(total que respondeu),29
+30,2026-11-27T08:24:03.969031+00:00,contexto:mascara,cirurgica_pano,2
+30,2026-11-27T08:24:03.969031+00:00,contexto:mascara,nao,17
+30,2026-11-27T08:24:03.969031+00:00,contexto:mascara,nao_saiu,8
+30,2026-11-27T08:24:03.969031+00:00,contexto:mascara,pff2_n95,2
+30,2026-11-27T08:24:03.969031+00:00,contexto:atividade_fisica_ar_livre,(total que respondeu),29
+30,2026-11-27T08:24:03.969031+00:00,contexto:atividade_fisica_ar_livre,nao,29
+30,2026-11-27T08:24:03.969031+00:00,contexto:ar_filtrado,(total que respondeu),28
+30,2026-11-27T08:24:03.969031+00:00,contexto:ar_filtrado,nao,11
+30,2026-11-27T08:24:03.969031+00:00,contexto:ar_filtrado,sim,17
+30,2026-11-27T08:24:03.969031+00:00,contexto:trabalho_ar_livre,(total que respondeu),28
+30,2026-11-27T08:24:03.969031+00:00,contexto:trabalho_ar_livre,nao,27
+30,2026-11-27T08:24:03.969031+00:00,contexto:trabalho_ar_livre,sim,1
+30,2026-11-27T08:24:03.969031+00:00,contexto:imunologica,(total que respondeu),29
+30,2026-11-27T08:24:03.969031+00:00,contexto:imunologica,nao,27
+30,2026-11-27T08:24:03.969031+00:00,contexto:imunologica,sim,2
+30,2026-11-27T08:24:03.969031+00:00,contexto:medicacao_a_mao,(total que respondeu),22
+30,2026-11-27T08:24:03.969031+00:00,contexto:medicacao_a_mao,nao,22
+30,2026-11-27T08:24:03.969031+00:00,contexto:medicacao_nao_alivia,(total que respondeu),19
+30,2026-11-27T08:24:03.969031+00:00,contexto:medicacao_nao_alivia,nao,13
+30,2026-11-27T08:24:03.969031+00:00,contexto:medicacao_nao_alivia,sim,6
+30,2026-11-27T08:24:03.969031+00:00,contexto:piorando,(total que respondeu),23
+30,2026-11-27T08:24:03.969031+00:00,contexto:piorando,nao,14
+30,2026-11-27T08:24:03.969031+00:00,contexto:piorando,sim,9

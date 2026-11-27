@@ -12,6 +12,12 @@
   "cidade": "Manaus"
  },
  {
+  "lat": -3.09,
+  "lon": -60.03,
+  "bairro": "Dom Pedro I",
+  "cidade": "Manaus"
+ },
+ {
   "lat": -3.08,
   "lon": -60.04,
   "bairro": "Alvorada",
@@ -36,6 +42,12 @@
   "cidade": "Manaus"
  },
  {
+  "lat": -3.06,
+  "lon": -59.97,
+  "bairro": "Novo Aleixo",
+  "cidade": "Manaus"
+ },
+ {
   "lat": -3.05,
   "lon": -59.97,
   "bairro": "Novo Aleixo",
@@ -51,6 +63,12 @@
   "lat": -3.02,
   "lon": -60.03,
   "bairro": "Tarumã",
+  "cidade": "Manaus"
+ },
+ {
+  "lat": -3.01,
+  "lon": -59.97,
+  "bairro": "Nova Cidade",
   "cidade": "Manaus"
  }
 ]
