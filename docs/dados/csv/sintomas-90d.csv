@@ -1,12 +1,12 @@
 ﻿periodo_dias,gerado_em_utc,sintoma_id,sintoma,relatos,percentual_das_respostas,leve,moderado,intenso,gravidade_media_0a3
-90,2026-11-27T21:13:28.833119+00:00,nose,Coriza ou nariz irritado,26,83.9,10,12,4,1.77
-90,2026-11-27T21:13:28.833119+00:00,throat,Irritação ou dor na garganta,25,80.6,11,10,4,1.72
-90,2026-11-27T21:13:28.833119+00:00,fatigue,Cansaço fora do normal,22,71.0,10,5,7,1.86
-90,2026-11-27T21:13:28.833119+00:00,headache,Dor de cabeça,21,67.7,10,5,6,1.81
-90,2026-11-27T21:13:28.833119+00:00,cough,Tosse,19,61.3,10,8,1,1.53
-90,2026-11-27T21:13:28.833119+00:00,eyes,"Olhos ardendo, vermelhos ou lacrimejando",19,61.3,10,6,3,1.63
-90,2026-11-27T21:13:28.833119+00:00,dizzy,Tontura ou confusão,11,35.5,6,3,2,1.64
-90,2026-11-27T21:13:28.833119+00:00,dyspnea,Falta de ar,10,32.3,7,1,2,1.5
-90,2026-11-27T21:13:28.833119+00:00,wheeze,Chiado no peito,9,29.0,5,3,1,1.56
-90,2026-11-27T21:13:28.833119+00:00,chest,Aperto ou dor no peito,7,22.6,7,0,0,1.0
-90,2026-11-27T21:13:28.833119+00:00,palpitation,Palpitações ou batimentos irregulares,3,9.7,3,0,0,1.0
+90,2026-11-28T07:43:10.677728+00:00,nose,Coriza ou nariz irritado,29,82.9,12,13,4,1.72
+90,2026-11-28T07:43:10.677728+00:00,throat,Irritação ou dor na garganta,27,77.1,12,11,4,1.7
+90,2026-11-28T07:43:10.677728+00:00,fatigue,Cansaço fora do normal,25,71.4,11,6,8,1.88
+90,2026-11-28T07:43:10.677728+00:00,headache,Dor de cabeça,23,65.7,10,6,7,1.87
+90,2026-11-28T07:43:10.677728+00:00,eyes,"Olhos ardendo, vermelhos ou lacrimejando",22,62.9,12,7,3,1.59
+90,2026-11-28T07:43:10.677728+00:00,cough,Tosse,20,57.1,11,8,1,1.5
+90,2026-11-28T07:43:10.677728+00:00,dizzy,Tontura ou confusão,14,40.0,9,3,2,1.5
+90,2026-11-28T07:43:10.677728+00:00,dyspnea,Falta de ar,10,28.6,7,1,2,1.5
+90,2026-11-28T07:43:10.677728+00:00,wheeze,Chiado no peito,9,25.7,5,3,1,1.56
+90,2026-11-28T07:43:10.677728+00:00,chest,Aperto ou dor no peito,7,20.0,7,0,0,1.0
+90,2026-11-28T07:43:10.677728+00:00,palpitation,Palpitações ou batimentos irregulares,3,8.6,3,0,0,1.0
